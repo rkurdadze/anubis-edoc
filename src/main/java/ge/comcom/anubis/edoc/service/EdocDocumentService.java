@@ -6,8 +6,8 @@ import ge.comcom.anubis.edoc.mapper.EdocDocumentMapper;
 import ge.comcom.anubis.edoc.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DatePeriod;
-import org.datacontract.schemas._2004._07.fas_docmanagement_integration_datacontracts.DocumentTypes;
+import org.datacontract.schemas._2004._07.fas_docmanagement.DatePeriod;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.stereotype.Service;
 
 import javax.xml.datatype.DatatypeConfigurationException;

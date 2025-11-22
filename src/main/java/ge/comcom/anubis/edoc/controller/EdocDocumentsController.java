@@ -4,7 +4,7 @@ import ge.comcom.anubis.edoc.model.EdocDocumentDetailsDto;
 import ge.comcom.anubis.edoc.model.EdocDocumentSummaryDto;
 import ge.comcom.anubis.edoc.service.EdocDocumentService;
 import lombok.RequiredArgsConstructor;
-import org.datacontract.schemas._2004._07.fas_docmanagement_integration_datacontracts.DocumentTypes;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class EdocDocumentsController {
 
     @GetMapping
     public List<EdocDocumentSummaryDto> getDocuments(
-            @RequestParam(name = "type", defaultValue = "ALL") DocumentTypes type,
+            @RequestParam(name = "type", defaultValue = "NONE") DocumentTypes type,
             @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return documentService.getDocuments(type, from, to);

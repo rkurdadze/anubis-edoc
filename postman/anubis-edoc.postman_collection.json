@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "Anubis eDoc API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "504d4362-f698-4935-9ca8-3430e7d8526a"
+  },
+  "item": [
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Get documents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/documents?type=ALL",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "documents"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "ALL"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get document by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}?full=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "documents",
+                "{{documentId}}"
+              ],
+              "query": [
+                {
+                  "key": "full",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark document exported",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "documents",
+                "{{documentId}}",
+                "exported"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "Physical persons by personal number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-personalNumber?personalNumber={{personalNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "contacts",
+                "physical",
+                "by-personalNumber"
+              ],
+              "query": [
+                {
+                  "key": "personalNumber",
+                  "value": "{{personalNumber}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Physical persons by name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-name?lastName={{lastName}}&firstName={{firstName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "contacts",
+                "physical",
+                "by-name"
+              ],
+              "query": [
+                {
+                  "key": "lastName",
+                  "value": "{{lastName}}"
+                },
+                {
+                  "key": "firstName",
+                  "value": "{{firstName}}",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Organizations by identification number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-identificationNumber?identificationNumber={{identificationNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "contacts",
+                "organizations",
+                "by-identificationNumber"
+              ],
+              "query": [
+                {
+                  "key": "identificationNumber",
+                  "value": "{{identificationNumber}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Organizations by name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-name?name={{organizationName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "contacts",
+                "organizations",
+                "by-name"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "{{organizationName}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "State structures",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/contacts/stateStructures?name={{structureName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "contacts",
+                "stateStructures"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "{{structureName}}",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "documentId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "personalNumber",
+      "value": "12345678901"
+    },
+    {
+      "key": "lastName",
+      "value": "Doe"
+    },
+    {
+      "key": "firstName",
+      "value": "John"
+    },
+    {
+      "key": "identificationNumber",
+      "value": "123456789"
+    },
+    {
+      "key": "organizationName",
+      "value": "Contoso"
+    },
+    {
+      "key": "structureName",
+      "value": ""
+    }
+  ]
+}

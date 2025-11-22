@@ -3,7 +3,7 @@ package ge.comcom.anubis.edoc.controller;
 import ge.comcom.anubis.edoc.model.EdocDocumentDetailsDto;
 import ge.comcom.anubis.edoc.model.EdocDocumentSummaryDto;
 import ge.comcom.anubis.edoc.service.EdocDocumentService;
-import org.datacontract.schemas._2004._07.fas_docmanagement_integration_datacontracts.DocumentTypes;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
