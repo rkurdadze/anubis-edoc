@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  edoc:
+    build: .
+    ports:
+      - "4102:4102"
+    environment:
+      - SERVER_PORT=4102
+      - EDOC_CLIENT_AUTH_TOKEN=${EDOC_CLIENT_AUTH_TOKEN}
+      - EDOC_BASE_URL=${EDOC_BASE_URL:-https://edocument.ge/TEST/}
+      - EDOC_EXPORT_SERVICE_URL=${EDOC_EXPORT_SERVICE_URL:-https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc}
+      - EDOC_WSDL_URL=${EDOC_WSDL_URL:-https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl}
+      - EDOC_SERVICE_VERSION=${EDOC_SERVICE_VERSION:-1.0.0.0}

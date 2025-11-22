@@ -1,0 +1,779 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://tempuri.org/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" name="eDocumentExportService" targetNamespace="http://tempuri.org/">
+    <wsp:Policy wsu:Id="CustomBinding_IeDocumentExportService_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1"/>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="false"/>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <wsaw:UsingAddressing/>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="BasicHttpBinding_IeDocumentExportService_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="false"/>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsdl:types>
+        <xsd:schema>
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement"
+                        schemaLocation="schemas/FAS_DocManagement.xsd"/>
+
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices"
+                        schemaLocation="schemas/FAS_DocManagement_ExternalServices.xsd"/>
+
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration"
+                        schemaLocation="schemas/FAS_DocManagement_Integration.xsd"/>
+
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"
+                        schemaLocation="schemas/FAS_DocManagement_Integration_DataContracts.xsd"/>
+
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"
+                        schemaLocation="schemas/FAS_DocManagement_Integration_Export.xsd"/>
+
+            <xsd:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"
+                        schemaLocation="schemas/FAS_DocManagement_SystemFaults_Faults.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="IeDocumentExportService_LogOn_InputMessage">
+        <wsdl:part name="parameters" element="tns:LogOn"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_OutputMessage">
+        <wsdl:part name="parameters" element="tns:LogOnResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q1:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q2:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q3:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q4:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_InputMessage">
+        <wsdl:part name="parameters" element="tns:LogOut"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_OutputMessage">
+        <wsdl:part name="parameters" element="tns:LogOutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q5:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q6:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q7:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q8:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocuments"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocumentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q9:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q10="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q10:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q11="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q11:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q12="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q12:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocument"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocumentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q13="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q13:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q14="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q14:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q15="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q15:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q16="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q16:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_InputMessage">
+        <wsdl:part name="parameters" element="tns:SetDocumentExported"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_OutputMessage">
+        <wsdl:part name="parameters" element="tns:SetDocumentExportedResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q17="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q17:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q18="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q18:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q19="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q19:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q20="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q20:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByPersonalNumber"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByPersonalNumberResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q21="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q21:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q22="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q22:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q23="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q23:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q24="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q24:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByName"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q25="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q25:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q26="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q26:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q27="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q27:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q28="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q28:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByIdentificationNumber"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByIdentificationNumberResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q29="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q29:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q30="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q30:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q31="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q31:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q32="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q32:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByName"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q33="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q33:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q34="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q34:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q35="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q35:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q36="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q36:InternalFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetStateStructures"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetStateStructuresResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_SecurityFaultFault_FaultMessage">
+        <wsdl:part xmlns:q37="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q37:SecurityFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_ValidationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q38="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q38:ValidationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_OperationFaultFault_FaultMessage">
+        <wsdl:part xmlns:q39="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q39:OperationFault"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_InternalFaultFault_FaultMessage">
+        <wsdl:part xmlns:q40="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults" name="detail" element="q40:InternalFault"/>
+    </wsdl:message>
+    <wsdl:portType name="IeDocumentExportService">
+        <wsdl:operation name="LogOn">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOn" message="tns:IeDocumentExportService_LogOn_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnResponse" message="tns:IeDocumentExportService_LogOn_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_LogOn_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_LogOn_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_LogOn_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_LogOn_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOut" message="tns:IeDocumentExportService_LogOut_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutResponse" message="tns:IeDocumentExportService_LogOut_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_LogOut_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_LogOut_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_LogOut_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_LogOut_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocuments" message="tns:IeDocumentExportService_GetDocuments_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsResponse" message="tns:IeDocumentExportService_GetDocuments_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetDocuments_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetDocuments_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetDocuments_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetDocuments_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocument" message="tns:IeDocumentExportService_GetDocument_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentResponse" message="tns:IeDocumentExportService_GetDocument_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetDocument_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetDocument_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetDocument_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetDocument_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExported" message="tns:IeDocumentExportService_SetDocumentExported_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedResponse" message="tns:IeDocumentExportService_SetDocumentExported_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_SetDocumentExported_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_SetDocumentExported_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_SetDocumentExported_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_SetDocumentExported_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberResponse" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameResponse" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetPhysicalPersonsByName_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberResponse" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName" message="tns:IeDocumentExportService_GetOrganizationsByName_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameResponse" message="tns:IeDocumentExportService_GetOrganizationsByName_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByName_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByName_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByName_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetOrganizationsByName_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructures" message="tns:IeDocumentExportService_GetStateStructures_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresResponse" message="tns:IeDocumentExportService_GetStateStructures_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresSecurityFaultFault" name="SecurityFaultFault" message="tns:IeDocumentExportService_GetStateStructures_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresValidationFaultFault" name="ValidationFaultFault" message="tns:IeDocumentExportService_GetStateStructures_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresOperationFaultFault" name="OperationFaultFault" message="tns:IeDocumentExportService_GetStateStructures_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresInternalFaultFault" name="InternalFaultFault" message="tns:IeDocumentExportService_GetStateStructures_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CustomBinding_IeDocumentExportService" type="tns:IeDocumentExportService">
+        <wsp:PolicyReference URI="#CustomBinding_IeDocumentExportService_policy"/>
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="LogOn">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOn" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOut" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocuments" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocument" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/SetDocumentExported" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetStateStructures" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BasicHttpBinding_IeDocumentExportService" type="tns:IeDocumentExportService">
+        <wsp:PolicyReference URI="#BasicHttpBinding_IeDocumentExportService_policy"/>
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="LogOn">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOn" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOut" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocuments" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocument" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/SetDocumentExported" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetStateStructures" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="eDocumentExportService">
+        <wsdl:port name="CustomBinding_IeDocumentExportService" binding="tns:CustomBinding_IeDocumentExportService">
+            <soap12:address location="https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc"/>
+            <wsa10:EndpointReference>
+                <wsa10:Address>
+                    https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc
+                </wsa10:Address>
+            </wsa10:EndpointReference>
+        </wsdl:port>
+        <wsdl:port name="BasicHttpBinding_IeDocumentExportService" binding="tns:BasicHttpBinding_IeDocumentExportService">
+            <soap:address location="https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

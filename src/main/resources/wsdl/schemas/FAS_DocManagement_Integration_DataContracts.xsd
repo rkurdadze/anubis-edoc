@@ -1,0 +1,142 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts">
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+            <xs:simpleType name="DocumentTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="None"/>
+                    <xs:enumeration value="Incoming"/>
+                    <xs:enumeration value="Outgoing"/>
+                    <xs:enumeration value="Internal"/>
+                    <xs:enumeration value="Order"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentTypes" nillable="true" type="tns:DocumentTypes"/>
+            <xs:simpleType name="ContactTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="PhysicalPerson">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Organization">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="StateStructure">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ContactTypes" nillable="true" type="tns:ContactTypes"/>
+            <xs:simpleType name="DocumentStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Draft"/>
+                    <xs:enumeration value="InProcess"/>
+                    <xs:enumeration value="Completed"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentStatuses" nillable="true" type="tns:DocumentStatuses"/>
+            <xs:simpleType name="DocumentFileTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Main">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Attachment">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentFileTypes" nillable="true" type="tns:DocumentFileTypes"/>
+            <xs:simpleType name="RelationTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Response">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Request">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Working">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="RelationTypes" nillable="true" type="tns:RelationTypes"/>
+            <xs:simpleType name="ResponsibleStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="ReRegistered"/>
+                    <xs:enumeration value="SetCompleted"/>
+                    <xs:enumeration value="CompletionConfirmed"/>
+                    <xs:enumeration value="CompletionRejected"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ResponsibleStatuses" nillable="true" type="tns:ResponsibleStatuses"/>
+            <xs:simpleType name="SignatureStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="Rejected"/>
+                    <xs:enumeration value="Signed"/>
+                    <xs:enumeration value="Canceled"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="SignatureStatuses" nillable="true" type="tns:SignatureStatuses"/>
+            <xs:simpleType name="ViseStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="Rejected"/>
+                    <xs:enumeration value="Vised"/>
+                    <xs:enumeration value="Canceled"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ViseStatuses" nillable="true" type="tns:ViseStatuses"/>
+            <xs:simpleType name="OrderDirections">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Internal">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Outgoing">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="OrderDirections" nillable="true" type="tns:OrderDirections"/>
+        </xs:schema>

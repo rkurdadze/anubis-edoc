@@ -1,0 +1,71 @@
+{
+  "info": {
+    "name": "Edoc API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List documents",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:4102/api/edoc/documents?type=Incoming",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4102",
+          "path": ["api","edoc","documents"],
+          "query": [{"key": "type", "value": "Incoming"}]
+        }
+      }
+    },
+    {
+      "name": "Document details",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/documents/{{documentId}}?full=true"
+      }
+    },
+    {
+      "name": "Mark exported",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4102/api/edoc/documents/{{documentId}}/exported"
+      }
+    },
+    {
+      "name": "Physical by personal number",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/contacts/physical/by-personalNumber?personalNumber={{pn}}"
+      }
+    },
+    {
+      "name": "Physical by name",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/contacts/physical/by-name?lastName={{last}}&firstName={{first}}"
+      }
+    },
+    {
+      "name": "Organization by number",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/contacts/organizations/by-identificationNumber?identificationNumber={{org}}"
+      }
+    },
+    {
+      "name": "Organization by name",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/contacts/organizations/by-name?name={{name}}"
+      }
+    },
+    {
+      "name": "State structures",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4102/api/edoc/contacts/stateStructures?name={{term}}"
+      }
+    }
+  ]
+}

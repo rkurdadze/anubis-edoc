@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: edoc
+server:
+  port: 4102
+
+edoc:
+  enabled: true
+  base-url: https://edocument.ge/TEST/
+  export-service-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc
+  wsdl-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl
+  client-auth-token: ${EDOC_CLIENT_AUTH_TOKEN:}
+  service-version: "1.0.0.0"
+  connect-timeout-millis: 10000
+  read-timeout-millis: 60000
