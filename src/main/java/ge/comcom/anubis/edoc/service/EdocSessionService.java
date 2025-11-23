@@ -26,32 +26,32 @@ public class EdocSessionService {
             if (StringUtils.hasText(existing)) {
                 return existing;
             }
-            return login();
+            return createSession(properties.getClientAuthToken(), properties.getServiceVersion());
         });
     }
 
-    private String login() {
-        if (!StringUtils.hasText(properties.getClientAuthToken())) {
-            throw new EdocRemoteException("Токен edoc.client-auth-token не задан");
-        }
-        log.info("Выполняется LogOn в eDocument Export Service, версия {}", properties.getServiceVersion());
-        String sessionId = client.logOn(properties.getClientAuthToken(), properties.getServiceVersion());
-        if (!StringUtils.hasText(sessionId)) {
-            throw new EdocRemoteException("Пустой sessionID от LogOn");
-        }
-        log.info("Получена новая сессия eDocument: {}", sessionId);
+    public String logOn(String token, String version) {
+        String sessionId = createSession(token, version);
+        session.set(sessionId);
         return sessionId;
     }
 
     public void logout() {
-        String current = session.getAndSet(null);
-        if (StringUtils.hasText(current)) {
-            try {
-                client.logOut(current);
-                log.info("Выполнен LogOut для сессии {}", current);
-            } catch (Exception ex) {
-                log.warn("Ошибка при LogOut", ex);
-            }
+        logOut(null);
+    }
+
+    public void logOut(String sessionId) {
+        String target = StringUtils.hasText(sessionId) ? sessionId : session.get();
+        if (!StringUtils.hasText(target)) {
+            return;
+        }
+        try {
+            client.logOut(target);
+            log.info("Выполнен LogOut для сессии {}", target);
+        } catch (Exception ex) {
+            log.warn("Ошибка при LogOut", ex);
+        } finally {
+            session.compareAndSet(target, null);
         }
     }
 
@@ -63,5 +63,23 @@ public class EdocSessionService {
             session.set(null);
             return callback.apply(currentSession());
         }
+    }
+
+    private String createSession(String token, String version) {
+        String resolvedToken = StringUtils.hasText(token) ? token : properties.getClientAuthToken();
+        String resolvedVersion = StringUtils.hasText(version) ? version : properties.getServiceVersion();
+        if (!StringUtils.hasText(resolvedToken)) {
+            throw new EdocRemoteException("Токен edoc.client-auth-token не задан");
+        }
+        if (!StringUtils.hasText(resolvedVersion)) {
+            throw new EdocRemoteException("Версия сервиса edoc.service-version не задана");
+        }
+        log.info("Выполняется LogOn в eDocument Export Service, версия {}", resolvedVersion);
+        String sessionId = client.logOn(resolvedToken, resolvedVersion);
+        if (!StringUtils.hasText(sessionId)) {
+            throw new EdocRemoteException("Пустой sessionID от LogOn");
+        }
+        log.info("Получена новая сессия eDocument: {}", sessionId);
+        return sessionId;
     }
 }

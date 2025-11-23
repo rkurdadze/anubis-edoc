@@ -13,3 +13,10 @@ edoc:
   service-version: "1.0.0.0"
   connect-timeout-millis: 10000
   read-timeout-millis: 60000
+  client-token: BD081743-C0C4-43B6-A0C3-30914FC9888F
+
+
+cxf:
+  logging:
+    enabled: true
+    limit: -1

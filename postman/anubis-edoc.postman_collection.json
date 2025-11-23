@@ -1,20 +1,109 @@
 {
   "info": {
     "name": "Anubis eDoc API",
+    "_postman_id": "4f74d5f6-7af7-4a94-b1ce-e0c218a6af01",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_id": "504d4362-f698-4935-9ca8-3430e7d8526a"
+    "description": "Полная коллекция для проверки REST-обёртки eDocument Export Service. Содержит сценарии получения документов, детальной проверки данных и подтверждения экспорта, а также поиск всех типов контактов."
   },
   "item": [
+    {
+      "name": "Session",
+      "item": [
+        {
+          "name": "LogOn (get sessionId)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientAuthenticationToken\": \"{{clientAuthToken}}\",\n  \"serviceVersion\": \"{{serviceVersion}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/session/logon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "session",
+                "logon"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.expect(body).to.have.property('sessionId');",
+                  "pm.expect(body.sessionId).to.be.a('string').and.not.be.empty;",
+                  "pm.collectionVariables.set('sessionId', body.sessionId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "LogOut (close session)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/session/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "session",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 204', () => pm.response.to.have.status(204));",
+                  "pm.collectionVariables.unset('sessionId');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Documents",
       "item": [
         {
-          "name": "Get documents",
+          "name": "List documents by type and period",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents?type=ALL",
+              "raw": "{{baseUrl}}/api/edoc/documents?type={{documentType}}&from={{periodFrom}}&to={{periodTo}}&contactType={{contactType}}&contactId={{contactId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -26,7 +115,27 @@
               "query": [
                 {
                   "key": "type",
-                  "value": "ALL"
+                  "value": "{{documentType}}"
+                },
+                {
+                  "key": "from",
+                  "value": "{{periodFrom}}",
+                  "disabled": false
+                },
+                {
+                  "key": "to",
+                  "value": "{{periodTo}}",
+                  "disabled": false
+                },
+                {
+                  "key": "contactType",
+                  "value": "{{contactType}}",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "{{contactId}}",
+                  "disabled": true
                 }
               ]
             }
@@ -38,19 +147,28 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.expect(body).to.be.an('array', 'Ответ должен быть массивом');",
+                  "if (body.length > 0) {",
+                  "  const doc = body[0];",
+                  "  ['id','number','documentType','documentStatus','exportStatus','registrationDate'].forEach(key => pm.expect(doc).to.have.property(key));",
+                  "  pm.collectionVariables.set('documentId', doc.id);",
+                  "  pm.collectionVariables.set('documentNumber', doc.number);",
+                  "}",
+                  "pm.collectionVariables.set('documentsFound', body.length);"
                 ]
               }
             }
           ]
         },
         {
-          "name": "Get document by ID",
+          "name": "Get document by ID (full details)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}?full=true",
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}?full={{fullDetails}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -63,7 +181,7 @@
               "query": [
                 {
                   "key": "full",
-                  "value": "true"
+                  "value": "{{fullDetails}}"
                 }
               ]
             }
@@ -71,11 +189,34 @@
           "response": [],
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get('documentId') && pm.variables.get('documentId') === '00000000-0000-0000-0000-000000000000') {",
+                  "  throw new Error('Не задан documentId. Сначала выполните запрос получения списка документов или установите значение переменной.');",
+                  "}"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const doc = pm.response.json();",
+                  "['id','number','documentType','documentStatus','exportStatus','registrationDate','category'].forEach(key => pm.expect(doc).to.have.property(key));",
+                  "pm.collectionVariables.set('documentId', doc.id);",
+                  "const fullFlag = pm.request.url.query.find(q => q.key === 'full')?.value === 'true';",
+                  "if (fullFlag) {",
+                  "  pm.test('Файлы присутствуют при full=true', () => pm.expect(doc).to.have.property('files'));",
+                  "  pm.test('Связанные документы присутствуют при full=true', () => pm.expect(doc).to.have.property('relatedDocuments'));",
+                  "  if (doc.files && doc.files.length > 0) {",
+                  "    pm.collectionVariables.set('documentFileName', doc.files[0].name);",
+                  "  }",
+                  "}",
+                  "pm.test('Даты приведены к ISO', () => pm.expect(doc.registrationDate).to.match(/T/));"
                 ]
               }
             }
@@ -103,11 +244,23 @@
           "response": [],
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get('documentId') && pm.variables.get('documentId') === '00000000-0000-0000-0000-000000000000') {",
+                  "  throw new Error('Не задан documentId. Используйте запрос списка или детальный запрос перед пометкой экспорта.');",
+                  "}"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 204', function () { pm.response.to.have.status(204); });"
+                  "pm.test('Статус 204', () => pm.response.to.have.status(204));",
+                  "pm.test('Тело ответа пустое', () => pm.expect(pm.response.text()).to.be.empty);"
                 ]
               }
             }
@@ -150,7 +303,14 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.expect(data).to.be.an('array');",
+                  "if (data.length > 0) {",
+                  "  const person = data[0];",
+                  "  ['firstName','lastName','personalNumber'].forEach(key => pm.expect(person).to.have.property(key));",
+                  "}",
+                  "pm.collectionVariables.set('foundPhysicalCount', data.length);"
                 ]
               }
             }
@@ -193,7 +353,14 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.expect(data).to.be.an('array');",
+                  "if (data.length > 0) {",
+                  "  const person = data[0];",
+                  "  ['firstName','lastName','personalNumber'].forEach(key => pm.expect(person).to.have.property(key));",
+                  "}",
+                  "pm.collectionVariables.set('foundPhysicalByName', data.length);"
                 ]
               }
             }
@@ -231,7 +398,14 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.expect(data).to.be.an('array');",
+                  "if (data.length > 0) {",
+                  "  const org = data[0];",
+                  "  ['name','identificationNumber'].forEach(key => pm.expect(org).to.have.property(key));",
+                  "}",
+                  "pm.collectionVariables.set('foundOrganizationsByCode', data.length);"
                 ]
               }
             }
@@ -269,7 +443,14 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.expect(data).to.be.an('array');",
+                  "if (data.length > 0) {",
+                  "  const org = data[0];",
+                  "  ['name','identificationNumber'].forEach(key => pm.expect(org).to.have.property(key));",
+                  "}",
+                  "pm.collectionVariables.set('foundOrganizationsByName', data.length);"
                 ]
               }
             }
@@ -307,11 +488,71 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Статус 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.expect(data).to.be.an('array');",
+                  "if (data.length > 0) {",
+                  "  const struct = data[0];",
+                  "  ['name','identificationCode'].forEach(key => pm.expect(struct).to.have.property(key));",
+                  "}",
+                  "pm.collectionVariables.set('foundStructures', data.length);"
                 ]
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Workflows",
+      "item": [
+        {
+          "name": "Workflow: export first document from list",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "edoc",
+                "documents",
+                "{{documentId}}",
+                "exported"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get('documentId')) {",
+                  "  throw new Error('Для сценария экспорта сначала выполните \\\"List documents by type and period\\\" или задайте переменную documentId.');",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 204', () => pm.response.to.have.status(204));",
+                  "pm.test('Тело ответа пустое', () => pm.expect(pm.response.text()).to.be.empty);",
+                  "pm.collectionVariables.set('workflowExportedDocumentId', pm.collectionVariables.get('documentId'));"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
         }
       ]
     }
@@ -319,11 +560,31 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "http://localhost:4102"
+    },
+    {
+      "key": "documentType",
+      "value": "Incoming"
+    },
+    {
+      "key": "periodFrom",
+      "value": ""
+    },
+    {
+      "key": "periodTo",
+      "value": ""
     },
     {
       "key": "documentId",
       "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "documentNumber",
+      "value": ""
+    },
+    {
+      "key": "fullDetails",
+      "value": "true"
     },
     {
       "key": "personalNumber",
@@ -348,6 +609,28 @@
     {
       "key": "structureName",
       "value": ""
+    },
+    {
+      "key": "clientAuthToken",
+      "value": "{BD081743-C0C4-43B6-A0C3-30914FC9888F}"
+    },
+    {
+      "key": "serviceVersion",
+      "value": "1.0.0.0"
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "contactType",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "contactId",
+      "value": "",
+      "type": "string"
     }
   ]
 }

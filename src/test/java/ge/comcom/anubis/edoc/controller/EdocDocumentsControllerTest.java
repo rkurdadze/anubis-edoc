@@ -34,7 +34,8 @@ class EdocDocumentsControllerTest {
     void returnsDocuments() throws Exception {
         EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
         dto.setNumber("DOC-1");
-        Mockito.when(service.getDocuments(any(DocumentTypes.class), any(), any())).thenReturn(List.of(dto));
+        Mockito.when(service.getDocuments(any(DocumentTypes.class), any(), any(), any(), any()))
+                .thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/edoc/documents"))
                 .andExpect(status().isOk())

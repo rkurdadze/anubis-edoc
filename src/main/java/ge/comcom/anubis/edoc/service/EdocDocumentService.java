@@ -7,6 +7,8 @@ import ge.comcom.anubis.edoc.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.datacontract.schemas._2004._07.fas_docmanagement.DatePeriod;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.Contact;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.ContactTypes;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +31,12 @@ public class EdocDocumentService {
     private final EdocDocumentMapper documentMapper;
     private final EdocContactMapper contactMapper;
 
-    public List<EdocDocumentSummaryDto> getDocuments(DocumentTypes type, LocalDate from, LocalDate to) {
+    public List<EdocDocumentSummaryDto> getDocuments(DocumentTypes type, LocalDate from, LocalDate to,
+                                                    ContactTypes contactType, UUID contactId) {
         DatePeriod period = buildPeriod(from, to);
+        Contact contact = buildContact(contactType, contactId);
         List<EdocDocumentSummaryDto> result = sessionService.withSession(sessionId ->
-                documentMapper.toSummaryList(client.getDocuments(sessionId, type, period, null)));
+                documentMapper.toSummaryList(client.getDocuments(sessionId, type, period, contact)));
         log.debug("Получено {} документов", result.size());
         return result;
     }
@@ -90,5 +94,15 @@ public class EdocDocumentService {
     private XMLGregorianCalendar toCalendar(DatatypeFactory factory, LocalDate date) {
         GregorianCalendar calendar = GregorianCalendar.from(date.atStartOfDay(ZoneOffset.UTC));
         return factory.newXMLGregorianCalendar(calendar);
+    }
+
+    private Contact buildContact(ContactTypes contactType, UUID contactId) {
+        if (contactType == null || contactId == null) {
+            return null;
+        }
+        Contact contact = new Contact();
+        contact.setContactType(contactType);
+        contact.setID(contactId.toString());
+        return contact;
     }
 }
