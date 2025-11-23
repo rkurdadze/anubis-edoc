@@ -1,0 +1,11 @@
+*
+!EdocBridge
+!EdocBridge/**
+
+!ServiceReference
+!ServiceReference/**
+
+!Dockerfile
+!docker-compose.yml
+!.dockerignore
+!README.md
