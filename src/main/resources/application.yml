@@ -7,7 +7,7 @@ server:
 edoc:
   enabled: true
   base-url: https://edocument.ge/TEST/
-  export-service-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc
+  export-service-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb
   wsdl-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl
   client-auth-token: ${EDOC_CLIENT_AUTH_TOKEN:}
   service-version: "1.0.0.0"

@@ -38,8 +38,7 @@ public class EdocClientConfig {
         factory.setServiceName(new QName(NS, "eDocumentExportService"));
         factory.setEndpointName(new QName(NS, "CustomBinding_IeDocumentExportService"));
 
-        // Обязательный SOAP 1.2
-        factory.setBindingId("http://www.w3.org/2003/05/soap/bindings/HTTP/");
+        factory.setBindingId("http://schemas.xmlsoap.org/wsdl/soap/");
 
         // WS-Addressing включен
         factory.getFeatures().add(new WSAddressingFeature());
