@@ -1,0 +1,1880 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="eDocumentExportService" targetNamespace="http://tempuri.org/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+                  xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"
+                  xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
+                  xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract"
+                  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://tempuri.org/"
+                  xmlns:wsa10="http://www.w3.org/2005/08/addressing"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                  xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+    <wsp:Policy wsu:Id="CustomBinding_IeDocumentExportService_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1"/>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="false"/>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <wsaw:UsingAddressing/>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="BasicHttpBinding_IeDocumentExportService_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="false"/>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsdl:types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration"/>
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+            <xs:element name="LogOn">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="clientAuthenticationTocken" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="serviceVersion" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="LogOnResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="LogOnResult" type="q1:guid"
+                                    xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="LogOut">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q2:guid"
+                                    xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="LogOutResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetDocuments">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q3:guid"
+                                    xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="documentType" type="q4:DocumentTypes"
+                                    xmlns:q4="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                        <xs:element minOccurs="0" name="period" nillable="true" type="q5:DatePeriod"
+                                    xmlns:q5="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration"/>
+                        <xs:element minOccurs="0" name="contact" nillable="true" type="q6:Contact"
+                                    xmlns:q6="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetDocumentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetDocumentsResult" nillable="true" type="q7:ArrayOfDocument"
+                                    xmlns:q7="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetDocument">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q8:guid"
+                                    xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="documentID" type="q9:guid"
+                                    xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="getFullData" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetDocumentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetDocumentResult" nillable="true" type="q10:DocumentData"
+                                    xmlns:q10="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="SetDocumentExported">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q11:guid"
+                                    xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="documentID" type="q12:guid"
+                                    xmlns:q12="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="SetDocumentExportedResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPhysicalPersonsByPersonalNumber">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q13:guid"
+                                    xmlns:q13="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="personalNumber" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPhysicalPersonsByPersonalNumberResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetPhysicalPersonsByPersonalNumberResult" nillable="true"
+                                    type="q14:ArrayOfPhysicalPerson"
+                                    xmlns:q14="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPhysicalPersonsByName">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q15:guid"
+                                    xmlns:q15="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="lastName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="firstName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetPhysicalPersonsByNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetPhysicalPersonsByNameResult" nillable="true"
+                                    type="q16:ArrayOfPhysicalPerson"
+                                    xmlns:q16="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetOrganizationsByIdentificationNumber">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q17:guid"
+                                    xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="identificationNumber" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetOrganizationsByIdentificationNumberResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetOrganizationsByIdentificationNumberResult" nillable="true"
+                                    type="q18:ArrayOfOrganization"
+                                    xmlns:q18="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetOrganizationsByName">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q19:guid"
+                                    xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetOrganizationsByNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetOrganizationsByNameResult" nillable="true"
+                                    type="q20:ArrayOfOrganization"
+                                    xmlns:q20="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetStateStructures">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sessionID" type="q21:guid"
+                                    xmlns:q21="http://schemas.microsoft.com/2003/10/Serialization/"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetStateStructuresResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="GetStateStructuresResult" nillable="true"
+                                    type="q22:ArrayOfStateStructure"
+                                    xmlns:q22="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
+                   targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/">
+            <xs:element name="anyType" nillable="true" type="xs:anyType"/>
+            <xs:element name="anyURI" nillable="true" type="xs:anyURI"/>
+            <xs:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+            <xs:element name="boolean" nillable="true" type="xs:boolean"/>
+            <xs:element name="byte" nillable="true" type="xs:byte"/>
+            <xs:element name="dateTime" nillable="true" type="xs:dateTime"/>
+            <xs:element name="decimal" nillable="true" type="xs:decimal"/>
+            <xs:element name="double" nillable="true" type="xs:double"/>
+            <xs:element name="float" nillable="true" type="xs:float"/>
+            <xs:element name="int" nillable="true" type="xs:int"/>
+            <xs:element name="long" nillable="true" type="xs:long"/>
+            <xs:element name="QName" nillable="true" type="xs:QName"/>
+            <xs:element name="short" nillable="true" type="xs:short"/>
+            <xs:element name="string" nillable="true" type="xs:string"/>
+            <xs:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+            <xs:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+            <xs:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+            <xs:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+            <xs:element name="char" nillable="true" type="tns:char"/>
+            <xs:simpleType name="char">
+                <xs:restriction base="xs:int"/>
+            </xs:simpleType>
+            <xs:element name="duration" nillable="true" type="tns:duration"/>
+            <xs:simpleType name="duration">
+                <xs:restriction base="xs:duration">
+                    <xs:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+                    <xs:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+                    <xs:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="guid" nillable="true" type="tns:guid"/>
+            <xs:simpleType name="guid">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:attribute name="FactoryType" type="xs:QName"/>
+            <xs:attribute name="Id" type="xs:ID"/>
+            <xs:attribute name="Ref" type="xs:IDREF"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults">
+            <xs:complexType name="SecurityFault">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:EventFault">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="FaultCode" type="tns:SecurityFaultCodes"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="SecurityFault" nillable="true" type="tns:SecurityFault"/>
+            <xs:complexType name="EventFault">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="FaultMessage" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="EventFault" nillable="true" type="tns:EventFault"/>
+            <xs:simpleType name="SecurityFaultCodes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="None"/>
+                    <xs:enumeration value="UniqueSessionRequirementViolation"/>
+                    <xs:enumeration value="IdleSessionTimeoutRequirementViolation"/>
+                    <xs:enumeration value="IdleSessionTimeoutRequirementViolationWarning"/>
+                    <xs:enumeration value="ActiveSessionRequirementViolation"/>
+                    <xs:enumeration value="InvalidLoginOrPassword"/>
+                    <xs:enumeration value="InvalidAuthenticationFactorType"/>
+                    <xs:enumeration value="AuthenticationFactorTimeout"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="SecurityFaultCodes" nillable="true" type="tns:SecurityFaultCodes"/>
+            <xs:complexType name="ValidationFault">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:EventFault">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="ValidationFault" nillable="true" type="tns:ValidationFault"/>
+            <xs:complexType name="OperationFault">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:EventFault">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="OperationFault" nillable="true" type="tns:OperationFault"/>
+            <xs:complexType name="InternalFault">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:EventFault">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="InternalFault" nillable="true" type="tns:InternalFault"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts">
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+            <xs:simpleType name="DocumentTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="None"/>
+                    <xs:enumeration value="Incoming"/>
+                    <xs:enumeration value="Outgoing"/>
+                    <xs:enumeration value="Internal"/>
+                    <xs:enumeration value="Order"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentTypes" nillable="true" type="tns:DocumentTypes"/>
+            <xs:simpleType name="ContactTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="PhysicalPerson">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Organization">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="StateStructure">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ContactTypes" nillable="true" type="tns:ContactTypes"/>
+            <xs:simpleType name="DocumentStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Draft"/>
+                    <xs:enumeration value="InProcess"/>
+                    <xs:enumeration value="Completed"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentStatuses" nillable="true" type="tns:DocumentStatuses"/>
+            <xs:simpleType name="DocumentFileTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Main">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Attachment">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="DocumentFileTypes" nillable="true" type="tns:DocumentFileTypes"/>
+            <xs:simpleType name="RelationTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Response">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Request">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Working">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="RelationTypes" nillable="true" type="tns:RelationTypes"/>
+            <xs:simpleType name="ResponsibleStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="ReRegistered"/>
+                    <xs:enumeration value="SetCompleted"/>
+                    <xs:enumeration value="CompletionConfirmed"/>
+                    <xs:enumeration value="CompletionRejected"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ResponsibleStatuses" nillable="true" type="tns:ResponsibleStatuses"/>
+            <xs:simpleType name="SignatureStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="Rejected"/>
+                    <xs:enumeration value="Signed"/>
+                    <xs:enumeration value="Canceled"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="SignatureStatuses" nillable="true" type="tns:SignatureStatuses"/>
+            <xs:simpleType name="ViseStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Created"/>
+                    <xs:enumeration value="Reviewed"/>
+                    <xs:enumeration value="Rejected"/>
+                    <xs:enumeration value="Vised"/>
+                    <xs:enumeration value="Canceled"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ViseStatuses" nillable="true" type="tns:ViseStatuses"/>
+            <xs:simpleType name="OrderDirections">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Internal">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Outgoing">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="OrderDirections" nillable="true" type="tns:OrderDirections"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration">
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core"/>
+            <xs:complexType name="DatePeriod">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q1:IntegrationDataContract"
+                                  xmlns:q1="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="From" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="To" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="DatePeriod" nillable="true" type="tns:DatePeriod"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+            <xs:complexType name="IntegrationDataContract">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:element name="IntegrationDataContract" nillable="true" type="tns:IntegrationDataContract"/>
+        </xs:schema>
+        <xs:schema elementFormDefault="qualified"
+                   targetNamespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.Export"
+                   xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/">
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+            <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+            <xs:import namespace="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core"/>
+            <xs:complexType name="Contact">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q1:IntegrationDataContract"
+                                  xmlns:q1="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="ContactType" type="q2:ContactTypes"
+                                        xmlns:q2="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="ID" type="ser:guid"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="Contact" nillable="true" type="tns:Contact"/>
+            <xs:complexType name="PhysicalPerson">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Contact">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="FirstName" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="LastName" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="PersonalNumber" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="PhysicalPerson" nillable="true" type="tns:PhysicalPerson"/>
+            <xs:complexType name="Organization">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Contact">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="IdentificationNumber" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="JuridicalForm" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="Organization" nillable="true" type="tns:Organization"/>
+            <xs:complexType name="StateStructure">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Contact">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="StateStructure" nillable="true" type="tns:StateStructure"/>
+            <xs:complexType name="ArrayOfDocument">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Document" nillable="true"
+                                type="tns:Document"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfDocument" nillable="true" type="tns:ArrayOfDocument"/>
+            <xs:complexType name="Document">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q3:IntegrationDataContract"
+                                  xmlns:q3="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Category" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Deadline" nillable="true" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="DocumentStatus" type="q4:DocumentStatuses"
+                                        xmlns:q4="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="DocumentType" type="q5:DocumentTypes"
+                                        xmlns:q5="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="ExportStatus" type="tns:ExportStatuses"/>
+                            <xs:element minOccurs="0" name="ID" type="ser:guid"/>
+                            <xs:element minOccurs="0" name="IssueDecisionType" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Number" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="RegistrationDate" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="Document" nillable="true" type="tns:Document"/>
+            <xs:simpleType name="ExportStatuses">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Exportable">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="ExportInProcess">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="Exported">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="ExportFailed">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="ExportCanceled">
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">5
+                                </EnumerationValue>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="ExportStatuses" nillable="true" type="tns:ExportStatuses"/>
+            <xs:complexType name="DocumentData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Document">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Annotation" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Chancellary" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Comments" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Files" nillable="true" type="tns:ArrayOfDocumentFile"/>
+                            <xs:element minOccurs="0" name="Purpose" type="tns:PurposeTypes"/>
+                            <xs:element minOccurs="0" name="RelatedDocuments" nillable="true"
+                                        type="tns:ArrayOfRelatedDocument"/>
+                            <xs:element minOccurs="0" name="ResultProcess" nillable="true" type="tns:ResultProcess"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="DocumentData" nillable="true" type="tns:DocumentData"/>
+            <xs:complexType name="ArrayOfDocumentFile">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="DocumentFile" nillable="true"
+                                type="tns:DocumentFile"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfDocumentFile" nillable="true" type="tns:ArrayOfDocumentFile"/>
+            <xs:complexType name="DocumentFile">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q6:IntegrationDataContract"
+                                  xmlns:q6="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Content" nillable="true" type="xs:base64Binary"/>
+                            <xs:element minOccurs="0" name="FileType" type="q7:DocumentFileTypes"
+                                        xmlns:q7="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="DocumentFile" nillable="true" type="tns:DocumentFile"/>
+            <xs:simpleType name="PurposeTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="ForInformation"/>
+                    <xs:enumeration value="ForReaction"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="PurposeTypes" nillable="true" type="tns:PurposeTypes"/>
+            <xs:complexType name="ArrayOfRelatedDocument">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="RelatedDocument" nillable="true"
+                                type="tns:RelatedDocument"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfRelatedDocument" nillable="true" type="tns:ArrayOfRelatedDocument"/>
+            <xs:complexType name="RelatedDocument">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q8:IntegrationDataContract"
+                                  xmlns:q8="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Document" nillable="true" type="tns:DocumentInfo"/>
+                            <xs:element minOccurs="0" name="RelationType" type="q9:RelationTypes"
+                                        xmlns:q9="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="RelatedDocument" nillable="true" type="tns:RelatedDocument"/>
+            <xs:complexType name="DocumentInfo">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q10:IntegrationDataContract"
+                                  xmlns:q10="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="DocumentType" type="q11:DocumentTypes"
+                                        xmlns:q11="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="ExportStatus" nillable="true" type="tns:ExportStatuses"/>
+                            <xs:element minOccurs="0" name="ID" nillable="true" type="ser:guid"/>
+                            <xs:element minOccurs="0" name="Number" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="RegistrationDate" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="DocumentInfo" nillable="true" type="tns:DocumentInfo"/>
+            <xs:complexType name="ResultProcess">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Process">
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="ResultProcess" nillable="true" type="tns:ResultProcess"/>
+            <xs:complexType name="Process">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q12:IntegrationDataContract"
+                                  xmlns:q12="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Responsibles" nillable="true"
+                                        type="tns:ArrayOfResponsibleData"/>
+                            <xs:element minOccurs="0" name="Task" nillable="true" type="tns:TaskData"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="Process" nillable="true" type="tns:Process"/>
+            <xs:complexType name="ArrayOfResponsibleData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ResponsibleData" nillable="true"
+                                type="tns:ResponsibleData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfResponsibleData" nillable="true" type="tns:ArrayOfResponsibleData"/>
+            <xs:complexType name="ResponsibleData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q13:IntegrationDataContract"
+                                  xmlns:q13="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="ChildResponsibles" nillable="true"
+                                        type="tns:ArrayOfResponsibleData"/>
+                            <xs:element minOccurs="0" name="Deadline" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Employee" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="StartDate" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Status" type="q14:ResponsibleStatuses"
+                                        xmlns:q14="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="StatusChangeDate" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Task" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="ResponsibleData" nillable="true" type="tns:ResponsibleData"/>
+            <xs:complexType name="EmployeeData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q15:IntegrationDataContract"
+                                  xmlns:q15="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="FirstName" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="LastName" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="OrganizationStructure" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Position" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="EmployeeData" nillable="true" type="tns:EmployeeData"/>
+            <xs:complexType name="TaskData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q16:IntegrationDataContract"
+                                  xmlns:q16="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Deadline" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="InitiatedBy" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="IsInitiated" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="Number" type="xs:int"/>
+                            <xs:element minOccurs="0" name="StartDate" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Text" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="TaskData" nillable="true" type="tns:TaskData"/>
+            <xs:complexType name="IncomingDocumentData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:DocumentData">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Addressees" nillable="true" type="tns:ArrayOfEmployeeData"/>
+                            <xs:element minOccurs="0" name="OriginalDate" nillable="true" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="OriginalNumber" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="ReceiveWays" nillable="true"
+                                        type="tns:ArrayOfReceiveWayData"/>
+                            <xs:element minOccurs="0" name="Senders" nillable="true" type="tns:ArrayOfContact"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="IncomingDocumentData" nillable="true" type="tns:IncomingDocumentData"/>
+            <xs:complexType name="ArrayOfEmployeeData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="EmployeeData" nillable="true"
+                                type="tns:EmployeeData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfEmployeeData" nillable="true" type="tns:ArrayOfEmployeeData"/>
+            <xs:complexType name="ArrayOfReceiveWayData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ReceiveWayData" nillable="true"
+                                type="tns:ReceiveWayData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfReceiveWayData" nillable="true" type="tns:ArrayOfReceiveWayData"/>
+            <xs:complexType name="ReceiveWayData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q17:IntegrationDataContract"
+                                  xmlns:q17="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Comments" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="Way" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="ReceiveWayData" nillable="true" type="tns:ReceiveWayData"/>
+            <xs:complexType name="ArrayOfContact">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Contact" nillable="true" type="tns:Contact"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfContact" nillable="true" type="tns:ArrayOfContact"/>
+            <xs:complexType name="InternalDocumentData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:DocumentData">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="HasDigitalSignature" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="HasDigitalStamp" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="PreProcess" nillable="true" type="tns:PreparationProcess"/>
+                            <xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfEmployeeData"/>
+                            <xs:element minOccurs="0" name="Senders" nillable="true" type="tns:ArrayOfEmployeeData"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="InternalDocumentData" nillable="true" type="tns:InternalDocumentData"/>
+            <xs:complexType name="PreparationProcess">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:Process">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Signatures" nillable="true"
+                                        type="tns:ArrayOfSignatureData"/>
+                            <xs:element minOccurs="0" name="Vises" nillable="true" type="tns:ArrayOfViseData"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="PreparationProcess" nillable="true" type="tns:PreparationProcess"/>
+            <xs:complexType name="ArrayOfSignatureData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="SignatureData" nillable="true"
+                                type="tns:SignatureData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfSignatureData" nillable="true" type="tns:ArrayOfSignatureData"/>
+            <xs:complexType name="SignatureData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q18:IntegrationDataContract"
+                                  xmlns:q18="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Creator" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="Deadline" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="EntryDate" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Signatory" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="Status" type="q19:SignatureStatuses"
+                                        xmlns:q19="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="StatusChangeDate" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="SignatureData" nillable="true" type="tns:SignatureData"/>
+            <xs:complexType name="ArrayOfViseData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ViseData" nillable="true"
+                                type="tns:ViseData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfViseData" nillable="true" type="tns:ArrayOfViseData"/>
+            <xs:complexType name="ViseData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="q20:IntegrationDataContract"
+                                  xmlns:q20="http://schemas.datacontract.org/2004/07/FAS.DocManagement.ExternalServices.Core">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Author" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="ChildVises" nillable="true" type="tns:ArrayOfViseData"/>
+                            <xs:element minOccurs="0" name="Creator" nillable="true" type="tns:EmployeeData"/>
+                            <xs:element minOccurs="0" name="Deadline" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="EntryDate" type="xs:dateTime"/>
+                            <xs:element minOccurs="0" name="Status" type="q21:ViseStatuses"
+                                        xmlns:q21="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="StatusChangeDate" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="ViseData" nillable="true" type="tns:ViseData"/>
+            <xs:complexType name="OutgoingDocumentData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:DocumentData">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="HasDigitalSignature" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="HasDigitalStamp" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="PreProcess" nillable="true" type="tns:PreparationProcess"/>
+                            <xs:element minOccurs="0" name="Recipients" nillable="true" type="tns:ArrayOfContact"/>
+                            <xs:element minOccurs="0" name="Signatories" nillable="true"
+                                        type="tns:ArrayOfEmployeeData"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="OutgoingDocumentData" nillable="true" type="tns:OutgoingDocumentData"/>
+            <xs:complexType name="OrderDocumentData">
+                <xs:complexContent mixed="false">
+                    <xs:extension base="tns:DocumentData">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="Direction" type="q22:OrderDirections"
+                                        xmlns:q22="http://schemas.datacontract.org/2004/07/FAS.DocManagement.Integration.DataContracts"/>
+                            <xs:element minOccurs="0" name="HasDigitalSignature" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="HasDigitalStamp" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="InnerRecipients" nillable="true"
+                                        type="tns:ArrayOfEmployeeData"/>
+                            <xs:element minOccurs="0" name="OrderType" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="OuterRecipients" nillable="true" type="tns:ArrayOfContact"/>
+                            <xs:element minOccurs="0" name="PreProcess" nillable="true" type="tns:PreparationProcess"/>
+                            <xs:element minOccurs="0" name="RelatedEmployees" nillable="true"
+                                        type="tns:ArrayOfEmployeeData"/>
+                            <xs:element minOccurs="0" name="Signatories" nillable="true"
+                                        type="tns:ArrayOfEmployeeData"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:element name="OrderDocumentData" nillable="true" type="tns:OrderDocumentData"/>
+            <xs:complexType name="ArrayOfPhysicalPerson">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="PhysicalPerson" nillable="true"
+                                type="tns:PhysicalPerson"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfPhysicalPerson" nillable="true" type="tns:ArrayOfPhysicalPerson"/>
+            <xs:complexType name="ArrayOfOrganization">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Organization" nillable="true"
+                                type="tns:Organization"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfOrganization" nillable="true" type="tns:ArrayOfOrganization"/>
+            <xs:complexType name="ArrayOfStateStructure">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="StateStructure" nillable="true"
+                                type="tns:StateStructure"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfStateStructure" nillable="true" type="tns:ArrayOfStateStructure"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="IeDocumentExportService_LogOn_InputMessage">
+        <wsdl:part name="parameters" element="tns:LogOn"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_OutputMessage">
+        <wsdl:part name="parameters" element="tns:LogOnResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q1:SecurityFault"
+                   xmlns:q1="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q2:ValidationFault"
+                   xmlns:q2="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q3:OperationFault"
+                   xmlns:q3="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOn_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q4:InternalFault"
+                   xmlns:q4="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_InputMessage">
+        <wsdl:part name="parameters" element="tns:LogOut"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_OutputMessage">
+        <wsdl:part name="parameters" element="tns:LogOutResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q5:SecurityFault"
+                   xmlns:q5="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q6:ValidationFault"
+                   xmlns:q6="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q7:OperationFault"
+                   xmlns:q7="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_LogOut_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q8:InternalFault"
+                   xmlns:q8="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocuments"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocumentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q9:SecurityFault"
+                   xmlns:q9="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q10:ValidationFault"
+                   xmlns:q10="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q11:OperationFault"
+                   xmlns:q11="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocuments_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q12:InternalFault"
+                   xmlns:q12="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocument"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetDocumentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q13:SecurityFault"
+                   xmlns:q13="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q14:ValidationFault"
+                   xmlns:q14="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q15:OperationFault"
+                   xmlns:q15="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetDocument_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q16:InternalFault"
+                   xmlns:q16="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_InputMessage">
+        <wsdl:part name="parameters" element="tns:SetDocumentExported"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_OutputMessage">
+        <wsdl:part name="parameters" element="tns:SetDocumentExportedResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q17:SecurityFault"
+                   xmlns:q17="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q18:ValidationFault"
+                   xmlns:q18="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q19:OperationFault"
+                   xmlns:q19="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_SetDocumentExported_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q20:InternalFault"
+                   xmlns:q20="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByPersonalNumber"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByPersonalNumberResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q21:SecurityFault"
+                   xmlns:q21="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q22:ValidationFault"
+                   xmlns:q22="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q23:OperationFault"
+                   xmlns:q23="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q24:InternalFault"
+                   xmlns:q24="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByName"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetPhysicalPersonsByNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q25:SecurityFault"
+                   xmlns:q25="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q26:ValidationFault"
+                   xmlns:q26="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q27:OperationFault"
+                   xmlns:q27="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetPhysicalPersonsByName_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q28:InternalFault"
+                   xmlns:q28="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByIdentificationNumber"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByIdentificationNumberResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q29:SecurityFault"
+                   xmlns:q29="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message
+            name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q30:ValidationFault"
+                   xmlns:q30="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message
+            name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q31:OperationFault"
+                   xmlns:q31="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByIdentificationNumber_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q32:InternalFault"
+                   xmlns:q32="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByName"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetOrganizationsByNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q33:SecurityFault"
+                   xmlns:q33="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q34:ValidationFault"
+                   xmlns:q34="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q35:OperationFault"
+                   xmlns:q35="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetOrganizationsByName_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q36:InternalFault"
+                   xmlns:q36="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetStateStructures"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetStateStructuresResponse"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_SecurityFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q37:SecurityFault"
+                   xmlns:q37="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_ValidationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q38:ValidationFault"
+                   xmlns:q38="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_OperationFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q39:OperationFault"
+                   xmlns:q39="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:message name="IeDocumentExportService_GetStateStructures_InternalFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="q40:InternalFault"
+                   xmlns:q40="http://schemas.datacontract.org/2004/07/FAS.DocManagement.SystemFaults.Faults"/>
+    </wsdl:message>
+    <wsdl:portType name="IeDocumentExportService">
+        <wsdl:operation name="LogOn">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOn"
+                        message="tns:IeDocumentExportService_LogOn_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnResponse"
+                         message="tns:IeDocumentExportService_LogOn_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_LogOn_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_LogOn_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_LogOn_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOnInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_LogOn_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOut"
+                        message="tns:IeDocumentExportService_LogOut_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutResponse"
+                         message="tns:IeDocumentExportService_LogOut_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_LogOut_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_LogOut_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_LogOut_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/LogOutInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_LogOut_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocuments"
+                        message="tns:IeDocumentExportService_GetDocuments_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsResponse"
+                         message="tns:IeDocumentExportService_GetDocuments_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_GetDocuments_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_GetDocuments_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_GetDocuments_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentsInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_GetDocuments_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocument"
+                        message="tns:IeDocumentExportService_GetDocument_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentResponse"
+                         message="tns:IeDocumentExportService_GetDocument_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_GetDocument_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_GetDocument_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_GetDocument_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetDocumentInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_GetDocument_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExported"
+                        message="tns:IeDocumentExportService_SetDocumentExported_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedResponse"
+                         message="tns:IeDocumentExportService_SetDocumentExported_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_SetDocumentExported_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_SetDocumentExported_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_SetDocumentExported_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/SetDocumentExportedInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_SetDocumentExported_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber"
+                        message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InputMessage"/>
+            <wsdl:output
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberResponse"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OutputMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberSecurityFaultFault"
+                    name="SecurityFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberValidationFaultFault"
+                    name="ValidationFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberOperationFaultFault"
+                    name="OperationFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumberInternalFaultFault"
+                    name="InternalFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByPersonalNumber_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName"
+                        message="tns:IeDocumentExportService_GetPhysicalPersonsByName_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameResponse"
+                         message="tns:IeDocumentExportService_GetPhysicalPersonsByName_OutputMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameSecurityFaultFault"
+                    name="SecurityFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByName_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameValidationFaultFault"
+                    name="ValidationFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByName_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameOperationFaultFault"
+                    name="OperationFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByName_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByNameInternalFaultFault"
+                    name="InternalFaultFault"
+                    message="tns:IeDocumentExportService_GetPhysicalPersonsByName_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber"
+                        message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_InputMessage"/>
+            <wsdl:output
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberResponse"
+                    message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_OutputMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberSecurityFaultFault"
+                    name="SecurityFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberValidationFaultFault"
+                    name="ValidationFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberOperationFaultFault"
+                    name="OperationFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumberInternalFaultFault"
+                    name="InternalFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByIdentificationNumber_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName"
+                        message="tns:IeDocumentExportService_GetOrganizationsByName_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameResponse"
+                         message="tns:IeDocumentExportService_GetOrganizationsByName_OutputMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameSecurityFaultFault"
+                    name="SecurityFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByName_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameValidationFaultFault"
+                    name="ValidationFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByName_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameOperationFaultFault"
+                    name="OperationFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByName_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://tempuri.org/IeDocumentExportService/GetOrganizationsByNameInternalFaultFault"
+                    name="InternalFaultFault"
+                    message="tns:IeDocumentExportService_GetOrganizationsByName_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <wsdl:input wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructures"
+                        message="tns:IeDocumentExportService_GetStateStructures_InputMessage"/>
+            <wsdl:output wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresResponse"
+                         message="tns:IeDocumentExportService_GetStateStructures_OutputMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresSecurityFaultFault"
+                        name="SecurityFaultFault"
+                        message="tns:IeDocumentExportService_GetStateStructures_SecurityFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresValidationFaultFault"
+                        name="ValidationFaultFault"
+                        message="tns:IeDocumentExportService_GetStateStructures_ValidationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresOperationFaultFault"
+                        name="OperationFaultFault"
+                        message="tns:IeDocumentExportService_GetStateStructures_OperationFaultFault_FaultMessage"/>
+            <wsdl:fault wsaw:Action="http://tempuri.org/IeDocumentExportService/GetStateStructuresInternalFaultFault"
+                        name="InternalFaultFault"
+                        message="tns:IeDocumentExportService_GetStateStructures_InternalFaultFault_FaultMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CustomBinding_IeDocumentExportService" type="tns:IeDocumentExportService">
+        <wsp:PolicyReference URI="#CustomBinding_IeDocumentExportService_policy"/>
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="LogOn">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOn" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOut" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocuments" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocument" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/SetDocumentExported"
+                              style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber"
+                              style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName"
+                              style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <soap12:operation
+                    soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber"
+                    style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName"
+                              style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <soap12:operation soapAction="http://tempuri.org/IeDocumentExportService/GetStateStructures"
+                              style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap12:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap12:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap12:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap12:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BasicHttpBinding_IeDocumentExportService" type="tns:IeDocumentExportService">
+        <wsp:PolicyReference URI="#BasicHttpBinding_IeDocumentExportService_policy"/>
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="LogOn">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOn" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="LogOut">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/LogOut" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocuments">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocuments" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetDocument">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetDocument" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetDocumentExported">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/SetDocumentExported"
+                            style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByPersonalNumber">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByPersonalNumber"
+                            style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetPhysicalPersonsByName">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetPhysicalPersonsByName"
+                            style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByIdentificationNumber">
+            <soap:operation
+                    soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByIdentificationNumber"
+                    style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOrganizationsByName">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetOrganizationsByName"
+                            style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetStateStructures">
+            <soap:operation soapAction="http://tempuri.org/IeDocumentExportService/GetStateStructures"
+                            style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SecurityFaultFault">
+                <soap:fault use="literal" name="SecurityFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ValidationFaultFault">
+                <soap:fault use="literal" name="ValidationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="OperationFaultFault">
+                <soap:fault use="literal" name="OperationFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="InternalFaultFault">
+                <soap:fault use="literal" name="InternalFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="eDocumentExportService">
+        <wsdl:port name="CustomBinding_IeDocumentExportService" binding="tns:CustomBinding_IeDocumentExportService">
+            <soap12:address location="https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc"/>
+            <wsa10:EndpointReference>
+                <wsa10:Address>https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc</wsa10:Address>
+            </wsa10:EndpointReference>
+        </wsdl:port>
+        <wsdl:port name="BasicHttpBinding_IeDocumentExportService"
+                   binding="tns:BasicHttpBinding_IeDocumentExportService">
+            <soap:address location="https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
