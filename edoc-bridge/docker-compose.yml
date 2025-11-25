@@ -1,8 +1,0 @@
-services:
-  edoc-bridge:
-    build: .
-    container_name: edoc-bridge
-    ports:
-      - "5080:5080"
-    environment:
-      EDOC_CLIENT_AUTH_TOKEN: "${EDOC_CLIENT_AUTH_TOKEN}"
