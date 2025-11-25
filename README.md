@@ -15,7 +15,7 @@ Spring Boot 3 приложение, инкапсулирующее SOAP eDocumen
 | Свойство | Описание | По умолчанию |
 | --- | --- | --- |
 | `edoc.base-url` | Базовый портал | `https://edocument.ge/TEST/` |
-| `edoc.export-service-url` | SOAP endpoint | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc` |
+| `edoc.export-service-url` | SOAP endpoint | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb` |
 | `edoc.wsdl-url` | WSDL | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl` |
 | `edoc.client-auth-token` | Токен клиента | `{BD081743-C0C4-43B6-A0C3-30914FC9888F}` |
 | `edoc.service-version` | Версия сервиса | `1.0.0.0` |

@@ -1,5 +1,10 @@
 package ge.comcom.anubis.edoc.client;
 
+import ge.comcom.anubis.edoc.exception.EdocInternalException;
+import ge.comcom.anubis.edoc.exception.EdocOperationException;
+import ge.comcom.anubis.edoc.exception.EdocRemoteException;
+import ge.comcom.anubis.edoc.exception.EdocSecurityException;
+import ge.comcom.anubis.edoc.exception.EdocValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.datacontract.schemas._2004._07.fas_docmanagement.DatePeriod;
@@ -30,7 +35,7 @@ public class EdocExportClient {
         try {
             return service.logOn(token, version);
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова logOn", ex);
+            throw mapFault("logOn", ex);
         }
     }
 
@@ -38,7 +43,7 @@ public class EdocExportClient {
         try {
             service.logOut(sessionId);
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова logOut", ex);
+            throw mapFault("logOut", ex);
         }
     }
 
@@ -47,7 +52,7 @@ public class EdocExportClient {
             ArrayOfDocument response = service.getDocuments(sessionId, type, period, contact);
             return Optional.ofNullable(response).map(ArrayOfDocument::getDocument).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getDocuments", ex);
+            throw mapFault("getDocuments", ex);
         }
     }
 
@@ -55,7 +60,7 @@ public class EdocExportClient {
         try {
             return service.getDocument(sessionId, documentId, full);
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getDocument", ex);
+            throw mapFault("getDocument", ex);
         }
     }
 
@@ -63,7 +68,7 @@ public class EdocExportClient {
         try {
             service.setDocumentExported(sessionId, documentId);
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова setDocumentExported", ex);
+            throw mapFault("setDocumentExported", ex);
         }
     }
 
@@ -72,7 +77,7 @@ public class EdocExportClient {
             ArrayOfPhysicalPerson response = service.getPhysicalPersonsByPersonalNumber(sessionId, personalNumber);
             return Optional.ofNullable(response).map(ArrayOfPhysicalPerson::getPhysicalPerson).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getPhysicalPersonsByPersonalNumber", ex);
+            throw mapFault("getPhysicalPersonsByPersonalNumber", ex);
         }
     }
 
@@ -81,7 +86,7 @@ public class EdocExportClient {
             ArrayOfPhysicalPerson response = service.getPhysicalPersonsByName(sessionId, lastName, firstName);
             return Optional.ofNullable(response).map(ArrayOfPhysicalPerson::getPhysicalPerson).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getPhysicalPersonsByName", ex);
+            throw mapFault("getPhysicalPersonsByName", ex);
         }
     }
 
@@ -90,7 +95,7 @@ public class EdocExportClient {
             ArrayOfOrganization response = service.getOrganizationsByIdentificationNumber(sessionId, identificationNumber);
             return Optional.ofNullable(response).map(ArrayOfOrganization::getOrganization).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getOrganizationsByIdentificationNumber", ex);
+            throw mapFault("getOrganizationsByIdentificationNumber", ex);
         }
     }
 
@@ -99,7 +104,7 @@ public class EdocExportClient {
             ArrayOfOrganization response = service.getOrganizationsByName(sessionId, name);
             return Optional.ofNullable(response).map(ArrayOfOrganization::getOrganization).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getOrganizationsByName", ex);
+            throw mapFault("getOrganizationsByName", ex);
         }
     }
 
@@ -108,7 +113,32 @@ public class EdocExportClient {
             ArrayOfStateStructure response = service.getStateStructures(sessionId, name);
             return Optional.ofNullable(response).map(ArrayOfStateStructure::getStateStructure).orElse(Collections.emptyList());
         } catch (Exception ex) {
-            throw new IllegalStateException("Ошибка вызова getStateStructures", ex);
+            throw mapFault("getStateStructures", ex);
         }
+    }
+
+    private RuntimeException mapFault(String operation, Exception ex) {
+        if (ex instanceof RuntimeException runtimeException) {
+            return runtimeException;
+        }
+
+        String exceptionName = ex.getClass().getSimpleName();
+        String message = ex.getMessage() != null ? ex.getMessage() : ex.toString();
+        String error = String.format("Ошибка вызова %s: %s", operation, message);
+
+        if (exceptionName.contains("SecurityFault")) {
+            return new EdocSecurityException(error, ex);
+        }
+        if (exceptionName.contains("ValidationFault")) {
+            return new EdocValidationException(error, ex);
+        }
+        if (exceptionName.contains("OperationFault")) {
+            return new EdocOperationException(error, ex);
+        }
+        if (exceptionName.contains("InternalFault")) {
+            return new EdocInternalException(error, ex);
+        }
+
+        return new EdocRemoteException(error, ex);
     }
 }
