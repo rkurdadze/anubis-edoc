@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -20,7 +21,8 @@ public class RestExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, "EDOC_SECURITY", ex, request);
     }
 
-    @ExceptionHandler({EdocValidationException.class, MethodArgumentNotValidException.class, IllegalArgumentException.class})
+    @ExceptionHandler({EdocValidationException.class, MethodArgumentNotValidException.class, IllegalArgumentException.class,
+            MissingServletRequestParameterException.class})
     public ResponseEntity<Map<String, Object>> handleValidation(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "EDOC_VALIDATION", ex, request);
     }

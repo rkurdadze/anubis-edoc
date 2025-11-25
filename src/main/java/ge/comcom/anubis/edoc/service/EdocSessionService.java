@@ -65,6 +65,18 @@ public class EdocSessionService {
         }
     }
 
+    public <T> T withProvidedSession(String sessionId, Function<String, T> callback) {
+        if (!StringUtils.hasText(sessionId)) {
+            throw new IllegalArgumentException("Не указан обязательный sessionId");
+        }
+        try {
+            return callback.apply(sessionId);
+        } catch (EdocSecurityException ex) {
+            log.warn("Переданный клиентом sessionId {} недействителен", sessionId, ex);
+            throw ex;
+        }
+    }
+
     private String createSession(String token, String version) {
         String resolvedToken = StringUtils.hasText(token) ? token : properties.getClientAuthToken();
         String resolvedVersion = StringUtils.hasText(version) ? version : properties.getServiceVersion();

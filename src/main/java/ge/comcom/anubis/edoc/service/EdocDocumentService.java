@@ -17,6 +17,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -31,12 +32,21 @@ public class EdocDocumentService {
     private final EdocDocumentMapper documentMapper;
     private final EdocContactMapper contactMapper;
 
-    public List<EdocDocumentSummaryDto> getDocuments(DocumentTypes type, LocalDate from, LocalDate to,
+    public List<EdocDocumentSummaryDto> getDocuments(String sessionId, DocumentTypes type, LocalDate from, LocalDate to,
                                                     ContactTypes contactType, UUID contactId) {
+        ContactTypes normalizedContactType = contactType;
+        UUID normalizedContactId = contactId;
+
+        if (normalizedContactType == null || normalizedContactId == null) {
+            normalizedContactType = null;
+            normalizedContactId = null;
+        }
+
+        validateParameters(sessionId, type, from, to, normalizedContactType, normalizedContactId);
         DatePeriod period = buildPeriod(from, to);
-        Contact contact = buildContact(contactType, contactId);
-        List<EdocDocumentSummaryDto> result = sessionService.withSession(sessionId ->
-                documentMapper.toSummaryList(client.getDocuments(sessionId, type, period, contact)));
+        Contact contact = buildContact(normalizedContactType, normalizedContactId);
+        List<EdocDocumentSummaryDto> result = sessionService.withProvidedSession(sessionId, sid ->
+                documentMapper.toSummaryList(client.getDocuments(sid, type, period, contact)));
         log.debug("Получено {} документов", result.size());
         return result;
     }
@@ -70,6 +80,27 @@ public class EdocDocumentService {
 
     public List<EdocStateStructureDto> getStateStructures(String name) {
         return sessionService.withSession(sessionId -> contactMapper.toStructureList(client.getStateStructures(sessionId, name)));
+    }
+
+    private void validateParameters(String sessionId, DocumentTypes type, LocalDate from, LocalDate to, ContactTypes contactType, UUID contactId) {
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new IllegalArgumentException("Не указан обязательный параметр sessionId");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("Не указан обязательный параметр type");
+        }
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Необходимо указать даты from и to для формирования периода");
+        }
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("Дата 'to' не может быть раньше 'from'");
+        }
+        if (ChronoUnit.DAYS.between(from, to) > 365) {
+            throw new IllegalArgumentException("Длительность периода не должна превышать 365 дней");
+        }
+        if (contactType != null && contactId == null) {
+            throw new IllegalArgumentException("Необходимо указать contactId при выборе contactType");
+        }
     }
 
     private DatePeriod buildPeriod(LocalDate from, LocalDate to) {

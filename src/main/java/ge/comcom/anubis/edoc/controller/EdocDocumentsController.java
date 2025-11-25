@@ -42,17 +42,19 @@ public class EdocDocumentsController {
             responses = @ApiResponse(responseCode = "200", description = "Список документов",
                     content = @Content(schema = @Schema(implementation = EdocDocumentSummaryDto.class))))
     public List<EdocDocumentSummaryDto> getDocuments(
+            @Parameter(description = "sessionId, полученный методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
+            @RequestParam(name = "sessionId") String sessionId,
             @Parameter(description = "Тип документа", example = "Incoming")
-            @RequestParam(name = "type", defaultValue = "NONE") DocumentTypes type,
+            @RequestParam(name = "type") DocumentTypes type,
             @Parameter(description = "Дата с", example = "2023-01-01")
-            @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(name = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @Parameter(description = "Дата по", example = "2023-12-31")
-            @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(name = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @Parameter(description = "Тип связанного контакта: PhysicalPerson/Organization/StateStructure", example = "Organization")
             @RequestParam(name = "contactType", required = false) ContactTypes contactType,
             @Parameter(description = "ID связанного контакта (GUID)", example = "15f5b4a7-7ad6-4de6-9a8f-fb39c5ba6c44")
             @RequestParam(name = "contactId", required = false) UUID contactId) {
-        return documentService.getDocuments(type, from, to, contactType, contactId);
+        return documentService.getDocuments(sessionId, type, from, to, contactType, contactId);
     }
 
     @GetMapping("/{id}")

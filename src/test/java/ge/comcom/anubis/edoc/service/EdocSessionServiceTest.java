@@ -22,6 +22,7 @@ class EdocSessionServiceTest {
         client = mock(EdocExportClient.class);
         properties = new EdocProperties();
         properties.setClientAuthToken("token");
+        properties.setServiceVersion("v1");
         service = new EdocSessionService(client, properties);
     }
 

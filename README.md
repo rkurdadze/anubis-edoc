@@ -40,7 +40,7 @@ docker run -p 4102:4102 -e EDOC_CLIENT_AUTH_TOKEN=... edoc-service
 Все методы из WCF-спецификации отображены один-к-одному:
 - `POST /api/edoc/session/logon` — явный LogOn, в ответе `sessionId`.
 - `POST /api/edoc/session/logout` — явный LogOut по текущей или указанной сессии.
-- `GET /api/edoc/documents?type=Incoming&from=2024-01-01&to=2024-01-31&contactType=Organization&contactId=15f5b4a7-7ad6-4de6-9a8f-fb39c5ba6c44` — GetDocuments (период + фильтр по связанному контакту).
+- `GET /api/edoc/documents?sessionId=f6c06169-2991-47db-b024-771031f3197b&type=Incoming&from=2024-01-01&to=2024-01-31` — GetDocuments (обязательные sessionId, тип и период; фильтр по связанному контакту contactType+contactId — опционален и игнорируется, если указан только один из параметров).
 - `GET /api/edoc/documents/{id}?full=true` — GetDocument (с флагом getFullData).
 - `POST /api/edoc/documents/{id}/exported` — SetDocumentExported.
 - `GET /api/edoc/contacts/physical/by-personalNumber?personalNumber=...` — GetPhysicalPersonsByPersonalNumber.
@@ -50,7 +50,7 @@ docker run -p 4102:4102 -e EDOC_CLIENT_AUTH_TOKEN=... edoc-service
 - `GET /api/edoc/contacts/stateStructures?name=...` — GetStateStructures.
 
 ## Swagger / OpenAPI
-Swagger UI доступен после запуска по адресу `http://localhost:8080/swagger-ui/index.html`.
+Swagger UI доступен после запуска по адресу `http://localhost:4102/swagger-ui/index.html`.
 
 - Описание включает все контроллеры и DTO с примерами.
 - Значения по умолчанию подхватывают дефолтный токен `{BD081743-C0C4-43B6-A0C3-30914FC9888F}` и версию `1.0.0.0`.
@@ -64,7 +64,7 @@ Swagger UI доступен после запуска по адресу `http://
 - тесты наличия ключевых полей и сохранение промежуточных переменных для последующих запросов;
 - workflow "export first document from list", позволяющий прогнать полный цикл: подбор по параметрам → детальный просмотр → отметка об экспорте.
 
-Для работы достаточно указать `baseUrl` и при необходимости значения для фильтров (период, тип документа, идентификаторы). Коллекция рассчитана на импорт в Postman Collection Runner или в качестве тестов в CI.
+Для работы достаточно указать `baseUrl` (`http://localhost:4102` по умолчанию) и при необходимости значения для фильтров (период, тип документа, идентификаторы). Коллекция рассчитана на импорт в Postman Collection Runner или в качестве тестов в CI.
 
 ## Документация
 Исходная спецификация: `eDocument_ExportService_Documentation_2019_11_05_v1.0.0.0.pdf`.

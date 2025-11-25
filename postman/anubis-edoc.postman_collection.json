@@ -103,7 +103,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents?type={{documentType}}&from={{periodFrom}}&to={{periodTo}}&contactType={{contactType}}&contactId={{contactId}}",
+              "raw": "{{baseUrl}}/api/edoc/documents?sessionId={{sessionId}}&type={{documentType}}&from={{periodFrom}}&to={{periodTo}}&contactType={{contactType}}&contactId={{contactId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -113,6 +113,10 @@
                 "documents"
               ],
               "query": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}"
+                },
                 {
                   "key": "type",
                   "value": "{{documentType}}"
@@ -142,6 +146,41 @@
           },
           "response": [],
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ensure = (key, valueFactory) => {",
+                  "  if (!pm.collectionVariables.get(key)) {",
+                  "    pm.collectionVariables.set(key, valueFactory());",
+                  "  }",
+                  "};",
+                  "ensure('periodFrom', () => moment().subtract(30, 'days').format('YYYY-MM-DD'));",
+                  "ensure('periodTo', () => moment().format('YYYY-MM-DD'));",
+                  "if (!pm.collectionVariables.get('baseUrl')) {",
+                  "  pm.collectionVariables.set('baseUrl', pm.variables.get('baseUrl') || 'http://localhost:4102');",
+                  "}",
+                  "if (!/^https?:\\/\\//.test(pm.collectionVariables.get('baseUrl'))) {",
+                  "  throw new Error('baseUrl должен содержать http или https, чтобы избежать ошибок CORS/Fetch');",
+                  "}",
+                  "if (!pm.collectionVariables.get('sessionId')) {",
+                  "  throw new Error('sessionId обязателен. Сначала выполните LogOn (получить sessionId)');",
+                  "}",
+                  "const hasContactType = !!pm.collectionVariables.get('contactType');",
+                  "const hasContactId = !!pm.collectionVariables.get('contactId');",
+                  "const contactTypeParam = pm.request.url.query.find(q => q.key === 'contactType');",
+                  "const contactIdParam = pm.request.url.query.find(q => q.key === 'contactId');",
+                  "if (hasContactType && hasContactId) {",
+                  "  contactTypeParam.disabled = false;",
+                  "  contactIdParam.disabled = false;",
+                  "} else {",
+                  "  contactTypeParam.disabled = true;",
+                  "  contactIdParam.disabled = true;",
+                  "}"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
