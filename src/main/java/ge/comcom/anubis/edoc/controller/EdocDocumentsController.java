@@ -42,15 +42,20 @@ public class EdocDocumentsController {
             responses = @ApiResponse(responseCode = "200", description = "Список документов",
                     content = @Content(schema = @Schema(implementation = EdocDocumentSummaryDto.class))))
     public List<EdocDocumentSummaryDto> getDocuments(
-            @Parameter(description = "Тип документа", example = "Incoming")
+            @Parameter(
+                    description = "Тип документа",
+                    example = "INCOMING",
+                    schema = @Schema(allowableValues = {"INCOMING", "OUTGOING", "INTERNAL", "ORDER"}))
             @RequestParam(name = "type") DocumentTypes type,
-            @Parameter(description = "Дата с", example = "2023-01-01")
-            @RequestParam(name = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @Parameter(description = "Дата по", example = "2023-12-31")
-            @RequestParam(name = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @Parameter(description = "Дата с", example = "2025-01-01")
+            @RequestParam(name = "from", defaultValue = "2025-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @Parameter(description = "Дата по", example = "2025-12-31")
+            @RequestParam(name = "to", defaultValue = "2025-12-31")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @Parameter(description = "Тип связанного контакта: PhysicalPerson/Organization/StateStructure", example = "Organization")
             @RequestParam(name = "contactType", required = false) ContactTypes contactType,
-            @Parameter(description = "ID связанного контакта (GUID)", example = "15f5b4a7-7ad6-4de6-9a8f-fb39c5ba6c44")
+            @Parameter(description = "ID связанного контакта (GUID)")
             @RequestParam(name = "contactId", required = false) UUID contactId) {
         return documentService.getDocuments(type, from, to, contactType, contactId);
     }

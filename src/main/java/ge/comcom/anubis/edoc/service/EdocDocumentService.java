@@ -86,6 +86,9 @@ public class EdocDocumentService {
         if (type == null) {
             throw new IllegalArgumentException("Не указан обязательный параметр type");
         }
+        if (DocumentTypes.NONE.equals(type)) {
+            throw new IllegalArgumentException("Необходимо указать один из типов: INCOMING, OUTGOING, INTERNAL, ORDER");
+        }
         if (from == null || to == null) {
             throw new IllegalArgumentException("Необходимо указать даты from и to для формирования периода");
         }
@@ -94,9 +97,6 @@ public class EdocDocumentService {
         }
         if (ChronoUnit.DAYS.between(from, to) > 365) {
             throw new IllegalArgumentException("Длительность периода не должна превышать 365 дней");
-        }
-        if (contactType != null && contactId == null) {
-            throw new IllegalArgumentException("Необходимо указать contactId при выборе contactType");
         }
     }
 
