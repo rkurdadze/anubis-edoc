@@ -65,18 +65,6 @@ public class EdocSessionService {
         }
     }
 
-    public <T> T withResolvedSession(String sessionId, Function<String, T> callback) {
-        if (StringUtils.hasText(sessionId)) {
-            try {
-                return callback.apply(sessionId);
-            } catch (EdocSecurityException ex) {
-                log.warn("Переданный клиентом sessionId {} недействителен, выполняется автоматический LogOn", sessionId, ex);
-                session.set(null);
-            }
-        }
-        return withSession(callback);
-    }
-
     private String createSession(String token, String version) {
         String resolvedToken = StringUtils.hasText(token) ? token : properties.getClientAuthToken();
         String resolvedVersion = StringUtils.hasText(version) ? version : properties.getServiceVersion();

@@ -32,52 +32,47 @@ public class EdocContactsController {
 
     @GetMapping("/physical/by-personalNumber")
     @Operation(summary = "Поиск физлиц по личному номеру",
+            description = "Сессия eDocument берётся автоматически",
             responses = @ApiResponse(responseCode = "200", description = "Список граждан",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = EdocPhysicalPersonDto.class)))))
-    public List<EdocPhysicalPersonDto> getPhysicalByPersonalNumber(@Parameter(description = "11-значный персональный номер", example = "12345678901") @RequestParam @NotBlank String personalNumber,
-                                                                  @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-                                                                  @RequestParam(name = "sessionId", required = false) String sessionId) {
-        return documentService.getPhysicalByPersonalNumber(personalNumber, sessionId);
+    public List<EdocPhysicalPersonDto> getPhysicalByPersonalNumber(@Parameter(description = "11-значный персональный номер", example = "12345678901") @RequestParam @NotBlank String personalNumber) {
+        return documentService.getPhysicalByPersonalNumber(personalNumber);
     }
 
     @GetMapping("/physical/by-name")
     @Operation(summary = "Поиск физлиц по ФИО",
+            description = "Сессия eDocument берётся автоматически",
             responses = @ApiResponse(responseCode = "200", description = "Список граждан",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = EdocPhysicalPersonDto.class)))))
     public List<EdocPhysicalPersonDto> getPhysicalByName(@Parameter(description = "Фамилия", example = "Иванов") @RequestParam @NotBlank String lastName,
-                                                         @Parameter(description = "Имя", example = "Иван") @RequestParam(required = false) String firstName,
-                                                         @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-                                                         @RequestParam(name = "sessionId", required = false) String sessionId) {
-        return documentService.getPhysicalByName(lastName, firstName, sessionId);
+                                                         @Parameter(description = "Имя", example = "Иван") @RequestParam(required = false) String firstName) {
+        return documentService.getPhysicalByName(lastName, firstName);
     }
 
     @GetMapping("/organizations/by-identificationNumber")
     @Operation(summary = "Поиск организаций по идентификатору",
+            description = "Сессия eDocument берётся автоматически",
             responses = @ApiResponse(responseCode = "200", description = "Список организаций",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = EdocOrganizationDto.class)))))
-    public List<EdocOrganizationDto> getOrganizationsByIdentification(@Parameter(description = "Идентификационный номер", example = "123456789") @RequestParam @NotBlank String identificationNumber,
-                                                                      @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-                                                                      @RequestParam(name = "sessionId", required = false) String sessionId) {
-        return documentService.getOrganizationsByIdentificationNumber(identificationNumber, sessionId);
+    public List<EdocOrganizationDto> getOrganizationsByIdentification(@Parameter(description = "Идентификационный номер", example = "123456789") @RequestParam @NotBlank String identificationNumber) {
+        return documentService.getOrganizationsByIdentificationNumber(identificationNumber);
     }
 
     @GetMapping("/organizations/by-name")
     @Operation(summary = "Поиск организаций по названию",
+            description = "Сессия eDocument берётся автоматически",
             responses = @ApiResponse(responseCode = "200", description = "Список организаций",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = EdocOrganizationDto.class)))))
-    public List<EdocOrganizationDto> getOrganizationsByName(@Parameter(description = "Название организации") @RequestParam @NotBlank String name,
-                                                            @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-                                                            @RequestParam(name = "sessionId", required = false) String sessionId) {
-        return documentService.getOrganizationsByName(name, sessionId);
+    public List<EdocOrganizationDto> getOrganizationsByName(@Parameter(description = "Название организации") @RequestParam @NotBlank String name) {
+        return documentService.getOrganizationsByName(name);
     }
 
     @GetMapping("/stateStructures")
     @Operation(summary = "Поиск государственных структур",
+            description = "Сессия eDocument берётся автоматически",
             responses = @ApiResponse(responseCode = "200", description = "Список госструктур",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = EdocStateStructureDto.class)))))
-    public List<EdocStateStructureDto> getStateStructures(@Parameter(description = "Название госструктуры") @RequestParam(required = false) String name,
-                                                         @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-                                                         @RequestParam(name = "sessionId", required = false) String sessionId) {
-        return documentService.getStateStructures(name, sessionId);
+    public List<EdocStateStructureDto> getStateStructures(@Parameter(description = "Название госструктуры") @RequestParam(required = false) String name) {
+        return documentService.getStateStructures(name);
     }
 }
