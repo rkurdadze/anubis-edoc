@@ -42,50 +42,47 @@ public class EdocDocumentService {
             normalizedContactId = null;
         }
 
-        validateParameters(sessionId, type, from, to, normalizedContactType, normalizedContactId);
+        validateParameters(type, from, to, normalizedContactType, normalizedContactId);
         DatePeriod period = buildPeriod(from, to);
         Contact contact = buildContact(normalizedContactType, normalizedContactId);
-        List<EdocDocumentSummaryDto> result = sessionService.withProvidedSession(sessionId, sid ->
+        List<EdocDocumentSummaryDto> result = sessionService.withResolvedSession(sessionId, sid ->
                 documentMapper.toSummaryList(client.getDocuments(sid, type, period, contact)));
         log.debug("Получено {} документов", result.size());
         return result;
     }
 
-    public EdocDocumentDetailsDto getDocument(UUID id, boolean full) {
-        return sessionService.withSession(sessionId -> documentMapper.toDetails(client.getDocument(sessionId, id.toString(), full)));
+    public EdocDocumentDetailsDto getDocument(UUID id, boolean full, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> documentMapper.toDetails(client.getDocument(sid, id.toString(), full)));
     }
 
-    public void setDocumentExported(UUID id) {
-        sessionService.withSession(sessionId -> {
-            client.setDocumentExported(sessionId, id.toString());
+    public void setDocumentExported(UUID id, String sessionId) {
+        sessionService.withResolvedSession(sessionId, sid -> {
+            client.setDocumentExported(sid, id.toString());
             return null;
         });
     }
 
-    public List<EdocPhysicalPersonDto> getPhysicalByPersonalNumber(String personalNumber) {
-        return sessionService.withSession(sessionId -> contactMapper.toPhysicalList(client.getPhysicalPersonsByPersonalNumber(sessionId, personalNumber)));
+    public List<EdocPhysicalPersonDto> getPhysicalByPersonalNumber(String personalNumber, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> contactMapper.toPhysicalList(client.getPhysicalPersonsByPersonalNumber(sid, personalNumber)));
     }
 
-    public List<EdocPhysicalPersonDto> getPhysicalByName(String lastName, String firstName) {
-        return sessionService.withSession(sessionId -> contactMapper.toPhysicalList(client.getPhysicalPersonsByName(sessionId, lastName, firstName)));
+    public List<EdocPhysicalPersonDto> getPhysicalByName(String lastName, String firstName, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> contactMapper.toPhysicalList(client.getPhysicalPersonsByName(sid, lastName, firstName)));
     }
 
-    public List<EdocOrganizationDto> getOrganizationsByIdentificationNumber(String identificationNumber) {
-        return sessionService.withSession(sessionId -> contactMapper.toOrganizationList(client.getOrganizationsByIdentificationNumber(sessionId, identificationNumber)));
+    public List<EdocOrganizationDto> getOrganizationsByIdentificationNumber(String identificationNumber, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> contactMapper.toOrganizationList(client.getOrganizationsByIdentificationNumber(sid, identificationNumber)));
     }
 
-    public List<EdocOrganizationDto> getOrganizationsByName(String name) {
-        return sessionService.withSession(sessionId -> contactMapper.toOrganizationList(client.getOrganizationsByName(sessionId, name)));
+    public List<EdocOrganizationDto> getOrganizationsByName(String name, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> contactMapper.toOrganizationList(client.getOrganizationsByName(sid, name)));
     }
 
-    public List<EdocStateStructureDto> getStateStructures(String name) {
-        return sessionService.withSession(sessionId -> contactMapper.toStructureList(client.getStateStructures(sessionId, name)));
+    public List<EdocStateStructureDto> getStateStructures(String name, String sessionId) {
+        return sessionService.withResolvedSession(sessionId, sid -> contactMapper.toStructureList(client.getStateStructures(sid, name)));
     }
 
-    private void validateParameters(String sessionId, DocumentTypes type, LocalDate from, LocalDate to, ContactTypes contactType, UUID contactId) {
-        if (sessionId == null || sessionId.isBlank()) {
-            throw new IllegalArgumentException("Не указан обязательный параметр sessionId");
-        }
+    private void validateParameters(DocumentTypes type, LocalDate from, LocalDate to, ContactTypes contactType, UUID contactId) {
         if (type == null) {
             throw new IllegalArgumentException("Не указан обязательный параметр type");
         }

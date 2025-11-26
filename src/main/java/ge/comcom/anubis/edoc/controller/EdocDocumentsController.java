@@ -43,7 +43,7 @@ public class EdocDocumentsController {
                     content = @Content(schema = @Schema(implementation = EdocDocumentSummaryDto.class))))
     public List<EdocDocumentSummaryDto> getDocuments(
             @Parameter(description = "sessionId, полученный методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
-            @RequestParam(name = "sessionId") String sessionId,
+            @RequestParam(name = "sessionId", required = false) String sessionId,
             @Parameter(description = "Тип документа", example = "Incoming")
             @RequestParam(name = "type") DocumentTypes type,
             @Parameter(description = "Дата с", example = "2023-01-01")
@@ -64,8 +64,10 @@ public class EdocDocumentsController {
                     content = @Content(schema = @Schema(implementation = EdocDocumentDetailsDto.class))))
     public EdocDocumentDetailsDto getDocument(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id,
                                               @Parameter(description = "Вернуть полные данные связанных процессов", example = "true")
-                                              @RequestParam(name = "full", defaultValue = "true") boolean full) {
-        return documentService.getDocument(id, full);
+                                              @RequestParam(name = "full", defaultValue = "true") boolean full,
+                                              @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
+                                              @RequestParam(name = "sessionId", required = false) String sessionId) {
+        return documentService.getDocument(id, full, sessionId);
     }
 
     @PostMapping("/{id}/exported")
@@ -73,7 +75,9 @@ public class EdocDocumentsController {
     @Operation(summary = "Подтвердить успешный экспорт", responses = {
             @ApiResponse(responseCode = "204", description = "Статус изменён")
     })
-    public void setExported(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
-        documentService.setDocumentExported(id);
+    public void setExported(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id,
+                            @Parameter(description = "sessionId, если уже получен методом LogOn", example = "f6c06169-2991-47db-b024-771031f3197b")
+                            @RequestParam(name = "sessionId", required = false) String sessionId) {
+        documentService.setDocumentExported(id, sessionId);
     }
 }

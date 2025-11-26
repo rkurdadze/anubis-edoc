@@ -90,7 +90,7 @@ class EdocDocumentsControllerTest {
         EdocDocumentDetailsDto dto = new EdocDocumentDetailsDto();
         dto.setNumber("DOC-2");
         UUID id = UUID.randomUUID();
-        Mockito.when(service.getDocument(eq(id), anyBoolean())).thenReturn(dto);
+        Mockito.when(service.getDocument(eq(id), anyBoolean(), isNull())).thenReturn(dto);
 
         mockMvc.perform(get("/api/edoc/documents/" + id))
                 .andExpect(status().isOk())

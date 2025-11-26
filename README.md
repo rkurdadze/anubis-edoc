@@ -15,7 +15,7 @@ Spring Boot 3 приложение, инкапсулирующее SOAP eDocumen
 | Свойство | Описание | По умолчанию |
 | --- | --- | --- |
 | `edoc.base-url` | Базовый портал | `https://edocument.ge/TEST/` |
-| `edoc.export-service-url` | SOAP endpoint | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb` |
+| `edoc.export-service-url` | SOAP endpoint (BasicHttpBinding) | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb` |
 | `edoc.wsdl-url` | WSDL | `https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl` |
 | `edoc.client-auth-token` | Токен клиента | `{BD081743-C0C4-43B6-A0C3-30914FC9888F}` |
 | `edoc.service-version` | Версия сервиса | `1.0.0.0` |
@@ -37,10 +37,10 @@ docker run -p 4102:4102 -e EDOC_CLIENT_AUTH_TOKEN=... edoc-service
 или `docker-compose up --build`.
 
 ## REST API
-Все методы из WCF-спецификации отображены один-к-одному:
+Все методы из WCF-спецификации отображены один-к-одному. Каждый метод принимает опциональный `sessionId` (если не указан или протух, сервис выполнит LogOn автоматически):
 - `POST /api/edoc/session/logon` — явный LogOn, в ответе `sessionId`.
 - `POST /api/edoc/session/logout` — явный LogOut по текущей или указанной сессии.
-- `GET /api/edoc/documents?sessionId=f6c06169-2991-47db-b024-771031f3197b&type=Incoming&from=2024-01-01&to=2024-01-31` — GetDocuments (обязательные sessionId, тип и период; фильтр по связанному контакту contactType+contactId — опционален и игнорируется, если указан только один из параметров).
+- `GET /api/edoc/documents?sessionId=f6c06169-2991-47db-b024-771031f3197b&type=Incoming&from=2024-01-01&to=2024-01-31` — GetDocuments (обязательны тип и период; фильтр по связанному контакту contactType+contactId — опционален и игнорируется, если указан только один из параметров).
 - `GET /api/edoc/documents/{id}?full=true` — GetDocument (с флагом getFullData).
 - `POST /api/edoc/documents/{id}/exported` — SetDocumentExported.
 - `GET /api/edoc/contacts/physical/by-personalNumber?personalNumber=...` — GetPhysicalPersonsByPersonalNumber.

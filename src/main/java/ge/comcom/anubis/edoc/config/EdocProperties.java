@@ -16,7 +16,4 @@ public class EdocProperties {
     private String serviceVersion;
     private int connectTimeoutMillis;
     private int readTimeoutMillis;
-
-    private String clientToken;
-
 }

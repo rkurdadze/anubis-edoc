@@ -65,16 +65,16 @@ public class EdocSessionService {
         }
     }
 
-    public <T> T withProvidedSession(String sessionId, Function<String, T> callback) {
-        if (!StringUtils.hasText(sessionId)) {
-            throw new IllegalArgumentException("Не указан обязательный sessionId");
+    public <T> T withResolvedSession(String sessionId, Function<String, T> callback) {
+        if (StringUtils.hasText(sessionId)) {
+            try {
+                return callback.apply(sessionId);
+            } catch (EdocSecurityException ex) {
+                log.warn("Переданный клиентом sessionId {} недействителен, выполняется автоматический LogOn", sessionId, ex);
+                session.set(null);
+            }
         }
-        try {
-            return callback.apply(sessionId);
-        } catch (EdocSecurityException ex) {
-            log.warn("Переданный клиентом sessionId {} недействителен", sessionId, ex);
-            throw ex;
-        }
+        return withSession(callback);
     }
 
     private String createSession(String token, String version) {

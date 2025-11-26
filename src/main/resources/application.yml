@@ -9,11 +9,10 @@ edoc:
   base-url: https://edocument.ge/TEST/
   export-service-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb
   wsdl-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl
-  client-auth-token: ${EDOC_CLIENT_AUTH_TOKEN:}
+  client-auth-token: "{BD081743-C0C4-43B6-A0C3-30914FC9888F}"
   service-version: "1.0.0.0"
   connect-timeout-millis: 10000
   read-timeout-millis: 60000
-  client-token: BD081743-C0C4-43B6-A0C3-30914FC9888F
 
 
 cxf:

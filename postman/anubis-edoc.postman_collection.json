@@ -103,7 +103,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents?sessionId={{sessionId}}&type={{documentType}}&from={{periodFrom}}&to={{periodTo}}&contactType={{contactType}}&contactId={{contactId}}",
+              "raw": "{{baseUrl}}/api/edoc/documents?sessionId={{sessionId}}&type={{documentType}}&from={{periodFrom}}&to={{periodTo}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -115,7 +115,8 @@
               "query": [
                 {
                   "key": "sessionId",
-                  "value": "{{sessionId}}"
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 },
                 {
                   "key": "type",
@@ -207,7 +208,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}?full={{fullDetails}}",
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}?full={{fullDetails}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -221,6 +222,11 @@
                 {
                   "key": "full",
                   "value": "{{fullDetails}}"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -267,7 +273,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported",
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported?sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -277,6 +283,13 @@
                 "documents",
                 "{{documentId}}",
                 "exported"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
+                }
               ]
             }
           },
@@ -316,7 +329,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-personalNumber?personalNumber={{personalNumber}}",
+              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-personalNumber?personalNumber={{personalNumber}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -331,6 +344,11 @@
                 {
                   "key": "personalNumber",
                   "value": "{{personalNumber}}"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -361,7 +379,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-name?lastName={{lastName}}&firstName={{firstName}}",
+              "raw": "{{baseUrl}}/api/edoc/contacts/physical/by-name?lastName={{lastName}}&firstName={{firstName}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -381,6 +399,11 @@
                   "key": "firstName",
                   "value": "{{firstName}}",
                   "disabled": false
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -411,7 +434,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-identificationNumber?identificationNumber={{identificationNumber}}",
+              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-identificationNumber?identificationNumber={{identificationNumber}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -426,6 +449,11 @@
                 {
                   "key": "identificationNumber",
                   "value": "{{identificationNumber}}"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -456,7 +484,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-name?name={{organizationName}}",
+              "raw": "{{baseUrl}}/api/edoc/contacts/organizations/by-name?name={{organizationName}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -471,6 +499,11 @@
                 {
                   "key": "name",
                   "value": "{{organizationName}}"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -501,7 +534,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/contacts/stateStructures?name={{structureName}}",
+              "raw": "{{baseUrl}}/api/edoc/contacts/stateStructures?name={{structureName}}&sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -516,6 +549,11 @@
                   "key": "name",
                   "value": "{{structureName}}",
                   "disabled": false
+                },
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
                 }
               ]
             }
@@ -551,7 +589,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported",
+              "raw": "{{baseUrl}}/api/edoc/documents/{{documentId}}/exported?sessionId={{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -561,6 +599,13 @@
                 "documents",
                 "{{documentId}}",
                 "exported"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Опциональный sessionId; при пустом значении сервис выполнит автоматический LogOn"
+                }
               ]
             }
           },
