@@ -71,12 +71,12 @@ public class EdocDocumentsController {
         return documentService.getDocument(id, full);
     }
 
-    @PostMapping("/{id}/exported")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Подтвердить успешный экспорт", responses = {
-            @ApiResponse(responseCode = "204", description = "Статус изменён")
-    })
-    public void setExported(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
-        documentService.setDocumentExported(id);
-    }
+//    @PostMapping("/{id}/exported")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @Operation(summary = "Подтвердить успешный экспорт", responses = {
+//            @ApiResponse(responseCode = "204", description = "Статус изменён")
+//    })
+//    public void setExported(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
+//        documentService.setDocumentExported(id);
+//    }
 }
