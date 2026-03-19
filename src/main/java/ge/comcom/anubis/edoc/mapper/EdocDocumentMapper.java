@@ -77,7 +77,22 @@ public interface EdocDocumentMapper {
             EdocRelatedDocumentDto dto = new EdocRelatedDocumentDto();
             dto.setRelationType(item.getRelationType() != null ? item.getRelationType().value() : null);
             DocumentInfo info = unwrap(item.getDocument());
-            dto.setDocumentNumber(info != null ? unwrap(info.getNumber()) : null);
+            if (info != null) {
+                dto.setDocumentNumber(unwrap(info.getNumber()));
+                
+                // Extra safety for ID extraction in related documents
+                Object rawId = info.getID();
+                String idStr = null;
+                if (rawId instanceof JAXBElement) {
+                    idStr = (String) ((JAXBElement<?>) rawId).getValue();
+                } else if (rawId instanceof String) {
+                    idStr = (String) rawId;
+                }
+                
+                if (idStr != null && !idStr.isEmpty()) {
+                    dto.setId(toUuid(idStr));
+                }
+            }
             return dto;
         }).collect(Collectors.toList());
     }
@@ -109,7 +124,7 @@ public interface EdocDocumentMapper {
 
     @Named("toUuid")
     default UUID toUuid(String guid) {
-        if (guid == null) {
+        if (guid == null || guid.isEmpty() || guid.equals("null")) {
             return null;
         }
         return UUID.fromString(guid);
