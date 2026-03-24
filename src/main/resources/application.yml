@@ -1,6 +1,28 @@
 spring:
   application:
     name: edoc
+
+  datasource:
+    url: ${ANUBIS_DB_URL:jdbc:postgresql://localhost:5432/anubis?currentSchema=public&charSet=UTF8}
+    username: ${ANUBIS_DB_USER:postgres}
+    password: ${ANUBIS_DB_PASSWORD:saadmin}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    table: edoc_flyway_schema_history
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+
 server:
   port: 4102
 

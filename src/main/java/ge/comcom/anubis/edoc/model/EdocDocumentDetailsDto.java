@@ -22,4 +22,35 @@ public class EdocDocumentDetailsDto {
     private String purpose;
     private List<EdocDocumentFileDto> files;
     private List<EdocRelatedDocumentDto> relatedDocuments;
+
+    // Cache metadata (populated when served from local DB)
+    private Boolean fromCache;
+    private OffsetDateTime cachedAt;
+    private Integer fetchCount;
+
+    // IncomingDocumentData
+    private String originalNumber;
+    private OffsetDateTime originalDate;
+    private List<EdocContactDto> senders;           // Contact[]
+    private List<EdocEmployeeDto> addressees;        // EmployeeData[]
+    private List<EdocReceiveWayDto> receiveWays;
+
+    // InternalDocumentData
+    private List<EdocEmployeeDto> employeeSenders;   // EmployeeData[]
+    private List<EdocEmployeeDto> employeeRecipients; // EmployeeData[]
+
+    // InternalDocumentData / OutgoingDocumentData / OrderDocumentData
+    private Boolean hasDigitalSignature;
+    private Boolean hasDigitalStamp;
+
+    // OutgoingDocumentData
+    private List<EdocContactDto> recipients;         // Contact[]
+    private List<EdocEmployeeDto> signatories;       // EmployeeData[]
+
+    // OrderDocumentData
+    private String direction;
+    private String orderType;
+    private List<EdocContactDto> outerRecipients;    // Contact[]
+    private List<EdocEmployeeDto> innerRecipients;   // EmployeeData[]
+    private List<EdocEmployeeDto> relatedEmployees;  // EmployeeData[]
 }

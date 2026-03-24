@@ -1,6 +1,7 @@
 package ge.comcom.anubis.edoc.service;
 
 import ge.comcom.anubis.edoc.client.EdocExportClient;
+import ge.comcom.anubis.edoc.exception.EdocNotCachedException;
 import ge.comcom.anubis.edoc.mapper.EdocContactMapper;
 import ge.comcom.anubis.edoc.mapper.EdocDocumentMapper;
 import ge.comcom.anubis.edoc.model.*;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.datacontract.schemas._2004._07.fas_docmanagement.DatePeriod;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.Contact;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.ContactTypes;
+import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentData;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.stereotype.Service;
 
@@ -31,16 +33,15 @@ public class EdocDocumentService {
     private final EdocSessionService sessionService;
     private final EdocDocumentMapper documentMapper;
     private final EdocContactMapper contactMapper;
+    private final EdocCacheService cacheService;
 
+    /**
+     * Returns document list from eDocument (always calls remote — no counter increment).
+     */
     public List<EdocDocumentSummaryDto> getDocuments(DocumentTypes type, LocalDate from, LocalDate to,
-                                                    ContactTypes contactType, UUID contactId) {
-        ContactTypes normalizedContactType = contactType;
-        UUID normalizedContactId = contactId;
-
-        if (normalizedContactType == null || normalizedContactId == null) {
-            normalizedContactType = null;
-            normalizedContactId = null;
-        }
+                                                     ContactTypes contactType, UUID contactId) {
+        ContactTypes normalizedContactType = (contactType != null && contactId != null) ? contactType : null;
+        UUID normalizedContactId = (contactType != null && contactId != null) ? contactId : null;
 
         validateParameters(type, from, to, normalizedContactType, normalizedContactId);
         DatePeriod period = buildPeriod(from, to);
@@ -51,16 +52,52 @@ public class EdocDocumentService {
         return result;
     }
 
-    public EdocDocumentDetailsDto getDocument(UUID id, boolean full) {
-        return sessionService.withSession(sid -> documentMapper.toDetails(client.getDocument(sid, id.toString(), full)));
+    /**
+     * Returns document details from LOCAL CACHE ONLY.
+     * Only Completed documents are cached — any other status will yield 404.
+     * Does NOT call the remote eDocument service.
+     */
+    public EdocDocumentDetailsDto getDocument(UUID id) {
+        return cacheService.findCached(id)
+                .orElseThrow(() -> new EdocNotCachedException(id));
     }
 
-    public void setDocumentExported(UUID id) {
-        sessionService.withSession(sid -> {
-            client.setDocumentExported(sid, id.toString());
-            return null;
-        });
+    /**
+     * Returns cache status for a given document ID (does not call remote).
+     */
+    public EdocCacheStatusDto getCacheStatus(UUID id) {
+        return cacheService.getCacheStatus(id);
     }
+
+    /**
+     * Manually fetches the document from the remote eDocument service (consumes one read cycle).
+     * If the document status is Completed, stores it in the local cache.
+     * Returns full document details regardless of status.
+     *
+     * This method MUST be called only after explicit user confirmation in the frontend.
+     */
+    public EdocDocumentDetailsDto fetchDocument(UUID id) {
+        log.info("Ручная загрузка документа {} с удалённого сервера (потребляет цикл чтения)", id);
+        DocumentData data = sessionService.withSession(sid ->
+                client.getDocument(sid, id.toString(), true));
+
+        boolean isCompleted = data.getDocumentStatus() != null
+                && "Completed".equals(data.getDocumentStatus().value());
+        if (isCompleted) {
+            EdocDocumentDetailsDto dto = cacheService.cacheAndGetDetails(data);
+            log.info("Документ {} (Completed) сохранён в кэш", id);
+            return dto;
+        }
+
+        // Non-Completed: return DTO from SOAP without caching
+        log.info("Документ {} имеет статус {} — не кэшируется", id,
+                data.getDocumentStatus() != null ? data.getDocumentStatus().value() : "null");
+        return documentMapper.toDetails(data);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Contacts (unchanged)
+    // ─────────────────────────────────────────────────────────────────────────
 
     public List<EdocPhysicalPersonDto> getPhysicalByPersonalNumber(String personalNumber) {
         return sessionService.withSession(sid -> contactMapper.toPhysicalList(client.getPhysicalPersonsByPersonalNumber(sid, personalNumber)));
@@ -82,7 +119,12 @@ public class EdocDocumentService {
         return sessionService.withSession(sid -> contactMapper.toStructureList(client.getStateStructures(sid, name)));
     }
 
-    private void validateParameters(DocumentTypes type, LocalDate from, LocalDate to, ContactTypes contactType, UUID contactId) {
+    // ─────────────────────────────────────────────────────────────────────────
+    // Private helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void validateParameters(DocumentTypes type, LocalDate from, LocalDate to,
+                                    ContactTypes contactType, UUID contactId) {
         if (type == null) {
             throw new IllegalArgumentException("Не указан обязательный параметр type");
         }
@@ -101,18 +143,11 @@ public class EdocDocumentService {
     }
 
     private DatePeriod buildPeriod(LocalDate from, LocalDate to) {
-        if (from == null && to == null) {
-            return null;
-        }
         try {
             DatatypeFactory factory = DatatypeFactory.newInstance();
             DatePeriod period = new DatePeriod();
-            if (from != null) {
-                period.setFrom(toCalendar(factory, from));
-            }
-            if (to != null) {
-                period.setTo(toCalendar(factory, to));
-            }
+            period.setFrom(toCalendar(factory, from));
+            period.setTo(toCalendar(factory, to));
             return period;
         } catch (DatatypeConfigurationException e) {
             throw new IllegalStateException("Ошибка создания даты", e);

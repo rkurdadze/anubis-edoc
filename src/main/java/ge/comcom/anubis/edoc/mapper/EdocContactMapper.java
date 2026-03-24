@@ -7,6 +7,7 @@ import org.datacontract.schemas._2004._07.fas_docmanagement_integration.Organiza
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.PhysicalPerson;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.StateStructure;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public interface EdocContactMapper {
 
     List<EdocOrganizationDto> toOrganizationList(List<Organization> orgs);
 
+    // StateStructure SOAP type has only "name"; identificationCode is not provided by the remote service
+    @Mapping(target = "identificationCode", ignore = true)
     EdocStateStructureDto toDto(StateStructure structure);
 
     List<EdocStateStructureDto> toStructureList(List<StateStructure> structures);

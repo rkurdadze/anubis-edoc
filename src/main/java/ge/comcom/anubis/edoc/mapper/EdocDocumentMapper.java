@@ -51,6 +51,27 @@ public interface EdocDocumentMapper {
     @Mapping(target = "comments", source = "comments", qualifiedByName = "unwrapString")
     @Mapping(target = "chancellary", source = "chancellary", qualifiedByName = "unwrapString")
     @Mapping(target = "purpose", expression = "java(data.getPurpose() != null ? data.getPurpose().value() : null)")
+    // Cache metadata — populated only by EdocCacheService, not from SOAP directly
+    @Mapping(target = "fromCache", ignore = true)
+    @Mapping(target = "cachedAt", ignore = true)
+    @Mapping(target = "fetchCount", ignore = true)
+    // Type-specific fields — populated only by EdocCacheService from typed subclasses
+    @Mapping(target = "originalNumber", ignore = true)
+    @Mapping(target = "originalDate", ignore = true)
+    @Mapping(target = "senders", ignore = true)
+    @Mapping(target = "addressees", ignore = true)
+    @Mapping(target = "receiveWays", ignore = true)
+    @Mapping(target = "employeeSenders", ignore = true)
+    @Mapping(target = "employeeRecipients", ignore = true)
+    @Mapping(target = "hasDigitalSignature", ignore = true)
+    @Mapping(target = "hasDigitalStamp", ignore = true)
+    @Mapping(target = "recipients", ignore = true)
+    @Mapping(target = "signatories", ignore = true)
+    @Mapping(target = "direction", ignore = true)
+    @Mapping(target = "orderType", ignore = true)
+    @Mapping(target = "outerRecipients", ignore = true)
+    @Mapping(target = "innerRecipients", ignore = true)
+    @Mapping(target = "relatedEmployees", ignore = true)
     EdocDocumentDetailsDto toDetails(DocumentData data);
 
     default List<EdocDocumentFileDto> mapFiles(JAXBElement<ArrayOfDocumentFile> filesElement) {

@@ -1,5 +1,6 @@
 package ge.comcom.anubis.edoc.controller;
 
+import ge.comcom.anubis.edoc.model.EdocCacheStatusDto;
 import ge.comcom.anubis.edoc.model.EdocDocumentDetailsDto;
 import ge.comcom.anubis.edoc.model.EdocDocumentSummaryDto;
 import ge.comcom.anubis.edoc.service.EdocDocumentService;
@@ -15,13 +16,7 @@ import org.datacontract.schemas._2004._07.fas_docmanagement_integration.Document
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,14 +32,14 @@ public class EdocDocumentsController {
     private final EdocDocumentService documentService;
 
     @GetMapping
-    @Operation(summary = "Получить список документов",
-            description = "Возвращает документы по типу и периоду регистрации",
+    @Operation(
+            summary = "Получить список документов",
+            description = "Возвращает документы по типу и периоду регистрации. " +
+                    "Запрос всегда идёт на удалённый сервис — счётчик чтения НЕ расходуется.",
             responses = @ApiResponse(responseCode = "200", description = "Список документов",
                     content = @Content(schema = @Schema(implementation = EdocDocumentSummaryDto.class))))
     public List<EdocDocumentSummaryDto> getDocuments(
-            @Parameter(
-                    description = "Тип документа",
-                    example = "INCOMING",
+            @Parameter(description = "Тип документа",
                     schema = @Schema(allowableValues = {"INCOMING", "OUTGOING", "INTERNAL", "ORDER"}))
             @RequestParam(name = "type") DocumentTypes type,
             @Parameter(description = "Дата с", example = "2025-01-01")
@@ -53,7 +48,7 @@ public class EdocDocumentsController {
             @Parameter(description = "Дата по", example = "2025-12-31")
             @RequestParam(name = "to", defaultValue = "2025-12-31")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @Parameter(description = "Тип связанного контакта: PhysicalPerson/Organization/StateStructure", example = "Organization")
+            @Parameter(description = "Тип связанного контакта")
             @RequestParam(name = "contactType", required = false) ContactTypes contactType,
             @Parameter(description = "ID связанного контакта (GUID)")
             @RequestParam(name = "contactId", required = false) UUID contactId) {
@@ -61,22 +56,49 @@ public class EdocDocumentsController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Получить детальную информацию по документу",
-            description = "Возвращает DocumentData/Incoming/Outgoing/Internal/Order в зависимости от типа",
-            responses = @ApiResponse(responseCode = "200", description = "Детали документа",
-                    content = @Content(schema = @Schema(implementation = EdocDocumentDetailsDto.class))))
-    public EdocDocumentDetailsDto getDocument(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id,
-                                              @Parameter(description = "Вернуть полные данные связанных процессов", example = "true")
-                                              @RequestParam(name = "full", defaultValue = "true") boolean full) {
-        return documentService.getDocument(id, full);
+    @Operation(
+            summary = "Получить детали документа из локального кэша",
+            description = "Возвращает детали документа ТОЛЬКО из локальной базы данных. " +
+                    "Кэшируются исключительно документы со статусом Completed. " +
+                    "Если документ отсутствует в кэше — 404. " +
+                    "Для принудительной загрузки с удалённого сервера используйте POST /{id}/fetch.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Детали документа из кэша",
+                            content = @Content(schema = @Schema(implementation = EdocDocumentDetailsDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Документ не найден в кэше")
+            })
+    public EdocDocumentDetailsDto getDocument(
+            @Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
+        return documentService.getDocument(id);
     }
 
-//    @PostMapping("/{id}/exported")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    @Operation(summary = "Подтвердить успешный экспорт", responses = {
-//            @ApiResponse(responseCode = "204", description = "Статус изменён")
-//    })
-//    public void setExported(@Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
-//        documentService.setDocumentExported(id);
-//    }
+    @PostMapping("/{id}/fetch")
+    @Operation(
+            summary = "Загрузить документ с удалённого сервера (ручное подтверждение)",
+            description = "Отправляет запрос GetDocument на удалённый eDocument сервис. " +
+                    "РАСХОДУЕТ один цикл чтения (лимит 3 на документ). " +
+                    "Должен вызываться ТОЛЬКО после явного подтверждения пользователя в интерфейсе. " +
+                    "Если статус документа Completed — результат сохраняется в локальном кэше. " +
+                    "Последующие вызовы GET /{id} будут возвращать данные из кэша без расхода цикла.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Детали документа"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "401", description = "Ошибка аутентификации"),
+                    @ApiResponse(responseCode = "502", description = "Ошибка связи с удалённым сервисом")
+            })
+    public EdocDocumentDetailsDto fetchDocument(
+            @Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
+        return documentService.fetchDocument(id);
+    }
+
+    @GetMapping("/{id}/cache-status")
+    @Operation(
+            summary = "Проверить статус кэша документа",
+            description = "Возвращает информацию о том, закэширован ли документ локально, " +
+                    "и метаданные кэша (дата, количество загрузок). Не обращается к удалённому сервису.",
+            responses = @ApiResponse(responseCode = "200", description = "Статус кэша"))
+    public EdocCacheStatusDto getCacheStatus(
+            @Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
+        return documentService.getCacheStatus(id);
+    }
 }

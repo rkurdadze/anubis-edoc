@@ -16,6 +16,11 @@ import java.util.Map;
 @ControllerAdvice
 public class RestExceptionHandler {
 
+    @ExceptionHandler({EdocNotCachedException.class})
+    public ResponseEntity<Map<String, Object>> handleNotCached(EdocNotCachedException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, "EDOC_NOT_CACHED", ex, request);
+    }
+
     @ExceptionHandler({EdocSecurityException.class})
     public ResponseEntity<Map<String, Object>> handleSecurity(EdocSecurityException ex, HttpServletRequest request) {
         return build(HttpStatus.UNAUTHORIZED, "EDOC_SECURITY", ex, request);
