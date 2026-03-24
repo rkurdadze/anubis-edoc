@@ -91,6 +91,18 @@ public class EdocDocumentsController {
         return documentService.fetchDocument(id);
     }
 
+    @PostMapping("/{id}/exported")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Пометить документ как экспортированный",
+            description = "Обновляет статус экспорта документа на 'Exported' в локальном кэше. " +
+                    "Не обращается к удалённому сервису eDocument. " +
+                    "Если документ не закэширован — операция игнорируется.")
+    public void markExported(
+            @Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
+        documentService.markExported(id);
+    }
+
     @GetMapping("/{id}/cache-status")
     @Operation(
             summary = "Проверить статус кэша документа",

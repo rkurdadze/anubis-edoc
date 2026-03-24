@@ -45,6 +45,8 @@ public class EdocDocumentService {
 
         validateParameters(type, from, to, normalizedContactType, normalizedContactId);
         DatePeriod period = buildPeriod(from, to);
+        log.info("Запрос документов eDocument: type={}, from={}, to={}, periodFrom={}, periodTo={}", 
+                type, from, to, period.getFrom(), period.getTo());
         Contact contact = buildContact(normalizedContactType, normalizedContactId);
         List<EdocDocumentSummaryDto> result = sessionService.withSession(sid ->
                 documentMapper.toSummaryList(client.getDocuments(sid, type, period, contact)));
@@ -81,18 +83,27 @@ public class EdocDocumentService {
         DocumentData data = sessionService.withSession(sid ->
                 client.getDocument(sid, id.toString(), true));
 
-        boolean isCompleted = data.getDocumentStatus() != null
-                && "Completed".equals(data.getDocumentStatus().value());
-        if (isCompleted) {
+        // Cache ALL explicitly fetched documents regardless of status.
+        // This ensures every manual fetch costs at most 1 read cycle — subsequent views come from cache.
+        // Non-Completed documents can be re-fetched later if the user wants fresh data.
+        String status = data.getDocumentStatus() != null ? data.getDocumentStatus().value() : "null";
+        try {
             EdocDocumentDetailsDto dto = cacheService.cacheAndGetDetails(data);
-            log.info("Документ {} (Completed) сохранён в кэш", id);
+            log.info("Документ {} (статус: {}) сохранён в кэш", id, status);
             return dto;
+        } catch (Exception cacheEx) {
+            log.error("Не удалось сохранить документ {} в кэш (статус: {}): {}", id, status, cacheEx.getMessage(), cacheEx);
+            // Return SOAP data without caching so the user still sees the document
+            return documentMapper.toDetails(data);
         }
+    }
 
-        // Non-Completed: return DTO from SOAP without caching
-        log.info("Документ {} имеет статус {} — не кэшируется", id,
-                data.getDocumentStatus() != null ? data.getDocumentStatus().value() : "null");
-        return documentMapper.toDetails(data);
+    /**
+     * Marks the document as exported in the local cache only.
+     * Does NOT call the remote eDocument service.
+     */
+    public void markExported(UUID id) {
+        cacheService.markExported(id);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -146,17 +157,21 @@ public class EdocDocumentService {
         try {
             DatatypeFactory factory = DatatypeFactory.newInstance();
             DatePeriod period = new DatePeriod();
-            period.setFrom(toCalendar(factory, from));
-            period.setTo(toCalendar(factory, to));
+            period.setFrom(toCalendar(factory, from, 0, 0, 0));
+            period.setTo(toCalendar(factory, to, 23, 59, 59));
             return period;
         } catch (DatatypeConfigurationException e) {
             throw new IllegalStateException("Ошибка создания даты", e);
         }
     }
 
-    private XMLGregorianCalendar toCalendar(DatatypeFactory factory, LocalDate date) {
-        GregorianCalendar calendar = GregorianCalendar.from(date.atStartOfDay(ZoneOffset.UTC));
-        return factory.newXMLGregorianCalendar(calendar);
+    private XMLGregorianCalendar toCalendar(DatatypeFactory factory, LocalDate date, int hour, int minute, int second) {
+        XMLGregorianCalendar calendar = factory.newXMLGregorianCalendar();
+        calendar.setYear(date.getYear());
+        calendar.setMonth(date.getMonthValue());
+        calendar.setDay(date.getDayOfMonth());
+        calendar.setTime(hour, minute, second);
+        return calendar;
     }
 
     private Contact buildContact(ContactTypes contactType, UUID contactId) {

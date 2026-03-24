@@ -58,6 +58,13 @@ public class RestExceptionHandler {
         body.put("path", request.getRequestURI());
         body.put("errorCode", code);
         body.put("message", ex.getMessage());
+        Throwable cause = ex.getCause();
+        if (cause != null) {
+            body.put("cause", cause.getMessage());
+            if (cause.getCause() != null) {
+                body.put("rootCause", cause.getCause().getMessage());
+            }
+        }
         return ResponseEntity.status(status).body(body);
     }
 }

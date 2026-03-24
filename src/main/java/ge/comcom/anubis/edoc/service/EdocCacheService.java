@@ -59,8 +59,21 @@ public class EdocCacheService {
     }
 
     /**
+     * Updates exportStatus to "Exported" in the local cache.
+     * Does NOT call the remote eDocument service.
+     * If the document is not cached, this is a no-op.
+     */
+    @Transactional
+    public void markExported(UUID id) {
+        documentRepo.findById(id).ifPresent(e -> {
+            e.setExportStatus("Exported");
+            documentRepo.save(e);
+            log.info("Документ {} помечен как Exported в локальном кэше", id);
+        });
+    }
+
+    /**
      * Saves/updates the document in the local cache and returns the full DTO.
-     * Call this only for Completed documents.
      */
     @Transactional
     public EdocDocumentDetailsDto cacheAndGetDetails(DocumentData data) {
@@ -532,7 +545,7 @@ public class EdocCacheService {
 
         // ORDER_SIGNATORY overrides signatories if present
         List<EdocEmployeeDto> orderSignatories = empDtoList(e, "ORDER_SIGNATORY");
-        if (!orderSignatories.isEmpty()) {
+        if (orderSignatories != null) {
             dto.setSignatories(orderSignatories);
         }
 
