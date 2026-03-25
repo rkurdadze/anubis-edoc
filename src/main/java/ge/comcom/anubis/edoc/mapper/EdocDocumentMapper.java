@@ -84,7 +84,7 @@ public interface EdocDocumentMapper {
             dto.setName(unwrap(file.getName()));
             dto.setFileType(file.getFileType() != null ? file.getFileType().value() : null);
             byte[] content = unwrap(file.getContent());
-            dto.setContentBase64(content != null ? java.util.Base64.getEncoder().encodeToString(content) : null);
+            dto.setSize(content != null ? (long) content.length : null);
             return dto;
         }).collect(Collectors.toList());
     }

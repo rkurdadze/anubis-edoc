@@ -5,6 +5,9 @@ import ge.comcom.anubis.edoc.exception.EdocNotCachedException;
 import ge.comcom.anubis.edoc.mapper.EdocContactMapper;
 import ge.comcom.anubis.edoc.mapper.EdocDocumentMapper;
 import ge.comcom.anubis.edoc.model.*;
+import ge.comcom.anubis.edoc.repository.EdocDocumentFileRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.datacontract.schemas._2004._07.fas_docmanagement.DatePeriod;
@@ -34,6 +37,7 @@ public class EdocDocumentService {
     private final EdocDocumentMapper documentMapper;
     private final EdocContactMapper contactMapper;
     private final EdocCacheService cacheService;
+    private final EdocDocumentFileRepository fileRepository;
 
     /**
      * Returns document list from eDocument (always calls remote — no counter increment).
@@ -104,6 +108,21 @@ public class EdocDocumentService {
      */
     public void markExported(UUID id) {
         cacheService.markExported(id);
+    }
+
+    public byte[] getFileContent(UUID docId, Long fileId) {
+        var file = fileRepository.findByIdAndDocumentId(fileId, docId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
+        if (file.getContent() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File content not available");
+        }
+        return file.getContent();
+    }
+
+    public String getFileName(UUID docId, Long fileId) {
+        return fileRepository.findByIdAndDocumentId(fileId, docId)
+                .map(f -> f.getName() != null ? f.getName() : "file")
+                .orElse("file");
     }
 
     // ─────────────────────────────────────────────────────────────────────────

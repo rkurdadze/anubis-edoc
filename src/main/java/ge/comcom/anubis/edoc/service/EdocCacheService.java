@@ -4,6 +4,8 @@ import ge.comcom.anubis.edoc.entity.*;
 import ge.comcom.anubis.edoc.model.*;
 import ge.comcom.anubis.edoc.repository.EdocCachedDocumentRepository;
 import ge.comcom.anubis.edoc.repository.EdocContactRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.xml.bind.JAXBElement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,9 @@ public class EdocCacheService {
 
     private final EdocCachedDocumentRepository documentRepo;
     private final EdocContactRepository contactRepo;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Public API
@@ -80,11 +85,14 @@ public class EdocCacheService {
         UUID id = extractId(data.getID());
         OffsetDateTime now = OffsetDateTime.now();
 
-        // If already cached, delete and re-insert to refresh all data
-        documentRepo.findById(id).ifPresent(existing -> {
-            documentRepo.delete(existing);
+        // If already cached — delete and evict from 1L cache before re-inserting.
+        // Using deleteById + flush + clear avoids Hibernate treating the same UUID as
+        // REMOVED-state in the session, which would break the subsequent persist().
+        if (documentRepo.existsById(id)) {
+            documentRepo.deleteById(id);
             documentRepo.flush();
-        });
+            entityManager.clear();
+        }
 
         EdocCachedDocumentEntity entity = new EdocCachedDocumentEntity();
         entity.setId(id);
@@ -105,8 +113,12 @@ public class EdocCacheService {
             fillOrder(entity, order);
         }
 
-        documentRepo.save(entity);
-        log.info("Документ {} ({}) сохранён в кэш", id, entity.getDocumentType());
+        // persist() (not merge) so that IDs from IDENTITY strategy are assigned
+        // directly on the entity objects inside entity.getFiles(), not on copies.
+        entityManager.persist(entity);
+        entityManager.flush();
+        log.info("Документ {} ({}) сохранён в кэш, файлов: {}", id, entity.getDocumentType(), entity.getFiles().size());
+        entity.getFiles().forEach(f -> log.debug("  Файл id={} name={}", f.getId(), f.getName()));
         return toDetailsDto(entity);
     }
 
@@ -495,9 +507,10 @@ public class EdocCacheService {
 
         dto.setFiles(e.getFiles().stream().map(f -> {
             EdocDocumentFileDto fd = new EdocDocumentFileDto();
+            fd.setId(f.getId());
             fd.setName(f.getName());
             fd.setFileType(f.getFileType());
-            fd.setContentBase64(f.getContent() != null ? Base64.getEncoder().encodeToString(f.getContent()) : null);
+            fd.setSize(f.getContent() != null ? (long) f.getContent().length : null);
             return fd;
         }).collect(Collectors.toList()));
 

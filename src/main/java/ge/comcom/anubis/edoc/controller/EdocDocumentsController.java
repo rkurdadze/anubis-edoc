@@ -14,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.ContactTypes;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,6 +92,19 @@ public class EdocDocumentsController {
     public EdocDocumentDetailsDto fetchDocument(
             @Parameter(description = "Идентификатор документа") @PathVariable("id") UUID id) {
         return documentService.fetchDocument(id);
+    }
+
+    @GetMapping("/{id}/files/{fileId}/content")
+    @Operation(summary = "Скачать содержимое файла документа из кэша")
+    public ResponseEntity<byte[]> getFileContent(
+            @PathVariable("id") UUID id,
+            @PathVariable("fileId") Long fileId) {
+        byte[] content = documentService.getFileContent(id, fileId);
+        String filename = documentService.getFileName(id, fileId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", filename);
+        return ResponseEntity.ok().headers(headers).body(content);
     }
 
     @PostMapping("/{id}/exported")
