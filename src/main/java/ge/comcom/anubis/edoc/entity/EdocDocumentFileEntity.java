@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "edoc_document_file")
+@Table(name = "document_file")
 @Getter
 @Setter
 public class EdocDocumentFileEntity {

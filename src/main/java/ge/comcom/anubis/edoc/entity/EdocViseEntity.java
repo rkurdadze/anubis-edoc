@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "edoc_vise")
+@Table(name = "vise")
 @Getter
 @Setter
 public class EdocViseEntity {

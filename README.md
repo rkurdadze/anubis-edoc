@@ -31,8 +31,19 @@ java -jar target/edoc-0.0.1-SNAPSHOT.jar
 
 Docker:
 ```bash
-docker build -t edoc-service .
-docker run -p 4102:4102 -e EDOC_CLIENT_AUTH_TOKEN=... edoc-service
+docker build -t edoc-service.jar .
+```
+
+```bash
+docker run -d \
+    -p 4102:4102 \
+    --name edoc-service \
+    --network anubis-net \
+    -e EDOC_CLIENT_AUTH_TOKEN="{BD081743-C0C4-43B6-A0C3-30914FC9888F}" \
+    -e EDOC_DB_URL=jdbc:postgresql://postgis:5432/edoc \
+    -e EDOC_DB_USER=postgres \
+    -e EDOC_DB_PASSWORD=saadmin \
+    edoc-service
 ```
 или `docker-compose up --build`.
 

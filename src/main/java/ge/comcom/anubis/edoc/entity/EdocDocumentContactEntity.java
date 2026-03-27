@@ -9,7 +9,7 @@ import lombok.Setter;
  * Role values: INCOMING_SENDER, OUTGOING_RECIPIENT, ORDER_OUTER_RECIPIENT
  */
 @Entity
-@Table(name = "edoc_document_contact")
+@Table(name = "document_contact")
 @Getter
 @Setter
 public class EdocDocumentContactEntity {

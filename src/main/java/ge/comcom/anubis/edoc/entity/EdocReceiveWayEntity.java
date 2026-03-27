@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "edoc_receive_way")
+@Table(name = "receive_way")
 @Getter
 @Setter
 public class EdocReceiveWayEntity {

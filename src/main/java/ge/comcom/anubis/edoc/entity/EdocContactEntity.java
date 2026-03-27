@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "edoc_contact")
+@Table(name = "contact")
 @Getter
 @Setter
 public class EdocContactEntity {

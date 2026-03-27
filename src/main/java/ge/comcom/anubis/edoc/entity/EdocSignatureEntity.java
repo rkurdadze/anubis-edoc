@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "edoc_signature")
+@Table(name = "signature")
 @Getter
 @Setter
 public class EdocSignatureEntity {

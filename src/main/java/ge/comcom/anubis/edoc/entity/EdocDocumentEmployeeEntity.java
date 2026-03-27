@@ -10,7 +10,7 @@ import lombok.Setter;
  *              OUTGOING_SIGNATORY, ORDER_INNER_RECIPIENT, ORDER_RELATED_EMPLOYEE, ORDER_SIGNATORY
  */
 @Entity
-@Table(name = "edoc_document_employee")
+@Table(name = "document_employee")
 @Getter
 @Setter
 public class EdocDocumentEmployeeEntity {

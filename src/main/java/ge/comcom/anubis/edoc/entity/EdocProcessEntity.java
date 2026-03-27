@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "edoc_process")
+@Table(name = "process")
 @Getter
 @Setter
 public class EdocProcessEntity {

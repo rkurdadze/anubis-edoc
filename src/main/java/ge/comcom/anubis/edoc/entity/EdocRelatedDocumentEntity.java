@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "edoc_related_document")
+@Table(name = "related_document")
 @Getter
 @Setter
 public class EdocRelatedDocumentEntity {

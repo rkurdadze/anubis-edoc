@@ -14,7 +14,7 @@ import java.util.UUID;
  * Type-specific columns are nullable and populated only for the relevant DocumentType.
  */
 @Entity
-@Table(name = "edoc_document")
+@Table(name = "document")
 @Getter
 @Setter
 public class EdocCachedDocumentEntity {
