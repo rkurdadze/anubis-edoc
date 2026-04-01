@@ -24,26 +24,32 @@ Spring Boot 3 приложение, инкапсулирующее SOAP eDocumen
 
 ## Сборка и запуск
 
-```bash
-mvn clean package
-java -jar target/edoc-0.0.1-SNAPSHOT.jar
-```
-
 Docker:
 ```bash
-docker build -t edoc-service.jar .
+    docker build --platform linux/amd64 -t anubis/edoc -f Dockerfile .
 ```
 
+Save:
 ```bash
-docker run -d \
-    -p 4102:4102 \
-    --name edoc-service \
-    --network anubis-net \
-    -e EDOC_CLIENT_AUTH_TOKEN="{BD081743-C0C4-43B6-A0C3-30914FC9888F}" \
-    -e EDOC_DB_URL=jdbc:postgresql://postgis:5432/edoc \
-    -e EDOC_DB_USER=postgres \
-    -e EDOC_DB_PASSWORD=saadmin \
-    edoc-service
+    docker save -o anubis-edoc.tar anubis/edoc
+```
+
+#### -> Отправьте эти файлы на сервер и загрузите
+```bash
+    docker load -i /var/www/anubis-edoc.tar
+```
+
+Run:
+```bash
+    docker run -d \
+        -p 4102:4102 \
+        --name edoc-service \
+        --network anubis-net \
+        -e EDOC_CLIENT_AUTH_TOKEN="{BD081743-C0C4-43B6-A0C3-30914FC9888F}" \
+        -e EDOC_DB_URL=jdbc:postgresql://postgis:5432/edoc \
+        -e EDOC_DB_USER=postgres \
+        -e EDOC_DB_PASSWORD=saadmin \
+        anubis/edoc
 ```
 или `docker-compose up --build`.
 
