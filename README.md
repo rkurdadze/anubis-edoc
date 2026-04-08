@@ -54,12 +54,14 @@ Run:
 или `docker-compose up --build`.
 
 ## REST API
-Все методы из WCF-спецификации отображены один-к-одному. Каждый метод принимает опциональный `sessionId` (если не указан или протух, сервис выполнит LogOn автоматически):
-- `POST /api/edoc/session/logon` — явный LogOn, в ответе `sessionId`.
-- `POST /api/edoc/session/logout` — явный LogOut по текущей или указанной сессии.
-- `GET /api/edoc/documents?sessionId=f6c06169-2991-47db-b024-771031f3197b&type=Incoming&from=2024-01-01&to=2024-01-31` — GetDocuments (обязательны тип и период; фильтр по связанному контакту contactType+contactId — опционален и игнорируется, если указан только один из параметров).
-- `GET /api/edoc/documents/{id}?full=true` — GetDocument (с флагом getFullData).
-- `POST /api/edoc/documents/{id}/exported` — SetDocumentExported.
+REST-обёртка предоставляет прикладные эндпоинты `/api/edoc/**`; управление `sessionId` выполняется сервисом автоматически (явный `logon` endpoint не используется).
+- `POST /api/edoc/session/logout` — явный LogOut текущей активной сессии.
+- `GET /api/edoc/documents?type=INCOMING&from=2024-01-01&to=2024-01-31` — GetDocuments (обязательны тип и период; фильтр по связанному контакту `contactType + contactId` опционален и учитывается только если заданы оба параметра).
+- `GET /api/edoc/documents/{id}` — детали документа **только из локального кэша** (`404 EDOC_NOT_CACHED`, если документа нет в кэше).
+- `POST /api/edoc/documents/{id}/fetch` — ручная загрузка документа с remote eDocument (consumes remote read cycle), затем сохранение в локальный кэш.
+- `GET /api/edoc/documents/{id}/cache-status` — статус локального кэша документа.
+- `GET /api/edoc/documents/{id}/files/{fileId}/content` — скачать содержимое файла документа из локального кэша.
+- `POST /api/edoc/documents/{id}/exported` — обновление локального статуса экспорта.
 - `GET /api/edoc/contacts/physical/by-personalNumber?personalNumber=...` — GetPhysicalPersonsByPersonalNumber.
 - `GET /api/edoc/contacts/physical/by-name?lastName=...&firstName=...` — GetPhysicalPersonsByName.
 - `GET /api/edoc/contacts/organizations/by-identificationNumber?identificationNumber=...` — GetOrganizationsByIdentificationNumber.
@@ -71,13 +73,13 @@ Swagger UI доступен после запуска по адресу `http://
 
 - Описание включает все контроллеры и DTO с примерами.
 - Значения по умолчанию подхватывают дефолтный токен `{BD081743-C0C4-43B6-A0C3-30914FC9888F}` и версию `1.0.0.0`.
-- Для генерации OpenAPI-спецификации в JSON: `curl http://localhost:8080/v3/api-docs`.
+- Для генерации OpenAPI-спецификации в JSON: `curl http://localhost:4102/v3/api-docs`.
 
 ## Тестовые коллекции
 В `postman/anubis-edoc.postman_collection.json` (идентичный файл лежит в `src/test/resources/postman/Edoc.postman_collection.json`) собраны готовые сценарии Postman.
 
 Коллекция включает:
-- проверки всех REST-методов (LogOn/LogOut, документы, подтверждение экспорта, поиски контактов);
+- проверки REST-методов (logout, документы, подтверждение экспорта, поиски контактов);
 - тесты наличия ключевых полей и сохранение промежуточных переменных для последующих запросов;
 - workflow "export first document from list", позволяющий прогнать полный цикл: подбор по параметрам → детальный просмотр → отметка об экспорте.
 
