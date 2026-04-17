@@ -27,17 +27,13 @@ server:
 
 edoc:
   enabled: true
-  base-url: https://edocument.ge/TEST/
-#  export-service-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb
-  export-service-url: https://srv5.edocument.ge/GNCC/integrationservice/eDocumentExportService.svc/bhb
-#  wsdl-url: https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl
-  wsdl-url: https://srv5.edocument.ge/GNCC/integrationservice/eDocumentExportService.svc?wsdl
-#  client-auth-token: "{BD081743-C0C4-43B6-A0C3-30914FC9888F}"
-  client-auth-token: "{A362EFA8-3C36-473F-B79C-5EAA65B68EF6}"
+  base-url: ${EDOC_BASE_URL:https://edocument.ge/TEST/}
+  export-service-url: ${EDOC_EXPORT_SERVICE_URL:https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc/bhb}
+  wsdl-url: ${EDOC_WSDL_URL:https://edocument.ge/TEST/integrationservice/eDocumentExportService.svc?wsdl}
+  client-auth-token: ${EDOC_CLIENT_AUTH_TOKEN:{BD081743-C0C4-43B6-A0C3-30914FC9888F}}
   service-version: "1.0.0.0"
   connect-timeout-millis: 10000
   read-timeout-millis: 60000
-
 
 cxf:
   logging:

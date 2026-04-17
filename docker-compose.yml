@@ -2,6 +2,7 @@ version: '3.8'
 services:
   edoc:
     build: .
+    container_name: edoc-service
     ports:
       - "4102:4102"
     environment:

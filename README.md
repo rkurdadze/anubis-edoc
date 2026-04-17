@@ -45,7 +45,7 @@ Run:
         -p 4102:4102 \
         --name edoc-service \
         --network anubis-net \
-        -e EDOC_CLIENT_AUTH_TOKEN="{BD081743-C0C4-43B6-A0C3-30914FC9888F}" \
+        -e EDOC_CLIENT_AUTH_TOKEN="{A362EFA8-3C36-473F-B79C-5EAA65B68EF6}" \
         -e EDOC_DB_URL=jdbc:postgresql://postgis:5432/edoc \
         -e EDOC_DB_USER=postgres \
         -e EDOC_DB_PASSWORD=saadmin \
