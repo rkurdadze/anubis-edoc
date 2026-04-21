@@ -148,6 +148,10 @@ public interface EdocDocumentMapper {
         if (guid == null || guid.isEmpty() || guid.equals("null")) {
             return null;
         }
-        return UUID.fromString(guid);
+        try {
+            return UUID.fromString(guid);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 }

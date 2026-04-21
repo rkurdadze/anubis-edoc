@@ -118,8 +118,12 @@ public class EdocExportClient {
     }
 
     private RuntimeException mapFault(String operation, Exception ex) {
-        if (ex instanceof RuntimeException runtimeException) {
-            return runtimeException;
+        if (ex instanceof EdocRemoteException
+                || ex instanceof EdocSecurityException
+                || ex instanceof EdocValidationException
+                || ex instanceof EdocOperationException
+                || ex instanceof EdocInternalException) {
+            return (RuntimeException) ex;
         }
 
         String exceptionName = ex.getClass().getSimpleName();
