@@ -34,6 +34,7 @@ edoc:
   service-version: "1.0.0.0"
   connect-timeout-millis: 10000
   read-timeout-millis: 60000
+  max-text-length: ${EDOC_MAX_TEXT_LENGTH:536870912}
 
 cxf:
   logging:

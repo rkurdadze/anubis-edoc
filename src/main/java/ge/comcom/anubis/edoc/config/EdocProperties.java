@@ -16,4 +16,9 @@ public class EdocProperties {
     private String serviceVersion;
     private int connectTimeoutMillis;
     private int readTimeoutMillis;
+    /**
+     * Maximum allowed XML text node length for CXF/Woodstox unmarshalling.
+     * Needed for large base64 payloads returned by GetDocument(full=true).
+     */
+    private int maxTextLength = 536_870_912; // 512 MiB
 }
