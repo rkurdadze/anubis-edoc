@@ -29,6 +29,9 @@ public class EdocCacheService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private record PendingResponsibleParent(EdocResponsibleEntity child, EdocResponsibleEntity parent) {}
+    private record PendingViseParent(EdocViseEntity child, EdocViseEntity parent) {}
+
     // ─────────────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────────────
@@ -84,6 +87,12 @@ public class EdocCacheService {
     public EdocDocumentDetailsDto cacheAndGetDetails(DocumentData data) {
         UUID id = extractId(data.getID());
         OffsetDateTime now = OffsetDateTime.now();
+        int nextFetchCount = documentRepo.findById(id)
+                .map(existing -> Math.max(existing.getFetchCount(), 0) + 1)
+                .orElse(1);
+
+        List<PendingResponsibleParent> pendingResponsibleParents = new ArrayList<>();
+        List<PendingViseParent> pendingViseParents = new ArrayList<>();
 
         // If already cached — delete and evict from 1L cache before re-inserting.
         // Using deleteById + flush + clear avoids Hibernate treating the same UUID as
@@ -97,26 +106,27 @@ public class EdocCacheService {
         EdocCachedDocumentEntity entity = new EdocCachedDocumentEntity();
         entity.setId(id);
         entity.setCachedAt(now);
-        entity.setFetchCount(1);
+        entity.setFetchCount(nextFetchCount);
         entity.setLastFetchedAt(now);
 
         fillBaseDocument(entity, data);
-        fillResultProcess(entity, data.getResultProcess());
+        fillResultProcess(entity, data.getResultProcess(), pendingResponsibleParents, pendingViseParents);
 
         if (data instanceof IncomingDocumentData incoming) {
             fillIncoming(entity, incoming);
         } else if (data instanceof InternalDocumentData internal) {
-            fillInternal(entity, internal);
+            fillInternal(entity, internal, pendingResponsibleParents, pendingViseParents);
         } else if (data instanceof OutgoingDocumentData outgoing) {
-            fillOutgoing(entity, outgoing);
+            fillOutgoing(entity, outgoing, pendingResponsibleParents, pendingViseParents);
         } else if (data instanceof OrderDocumentData order) {
-            fillOrder(entity, order);
+            fillOrder(entity, order, pendingResponsibleParents, pendingViseParents);
         }
 
         // persist() (not merge) so that IDs from IDENTITY strategy are assigned
         // directly on the entity objects inside entity.getFiles(), not on copies.
         entityManager.persist(entity);
         entityManager.flush();
+        resolveDeferredHierarchyLinks(pendingResponsibleParents, pendingViseParents);
         log.info("Документ {} ({}) сохранён в кэш, файлов: {}", id, entity.getDocumentType(), entity.getFiles().size());
         entity.getFiles().forEach(f -> log.debug("  Файл id={} name={}", f.getId(), f.getName()));
         return toDetailsDto(entity);
@@ -178,10 +188,13 @@ public class EdocCacheService {
         }
     }
 
-    private void fillResultProcess(EdocCachedDocumentEntity e, JAXBElement<ResultProcess> element) {
+    private void fillResultProcess(EdocCachedDocumentEntity e,
+                                   JAXBElement<ResultProcess> element,
+                                   List<PendingResponsibleParent> pendingResponsibleParents,
+                                   List<PendingViseParent> pendingViseParents) {
         ResultProcess rp = unwrap(element);
         if (rp != null) {
-            e.setResultProcess(buildProcess(rp, false));
+            e.setResultProcess(buildProcess(rp, false, pendingResponsibleParents, pendingViseParents));
         }
     }
 
@@ -223,13 +236,16 @@ public class EdocCacheService {
         }
     }
 
-    private void fillInternal(EdocCachedDocumentEntity e, InternalDocumentData d) {
+    private void fillInternal(EdocCachedDocumentEntity e,
+                              InternalDocumentData d,
+                              List<PendingResponsibleParent> pendingResponsibleParents,
+                              List<PendingViseParent> pendingViseParents) {
         e.setHasDigitalSignature(d.isHasDigitalSignature());
         e.setHasDigitalStamp(d.isHasDigitalStamp());
 
         PreparationProcess pp = unwrap(d.getPreProcess());
         if (pp != null) {
-            e.setPreparationProcess(buildProcess(pp, true));
+            e.setPreparationProcess(buildProcess(pp, true, pendingResponsibleParents, pendingViseParents));
         }
 
         // Senders: EmployeeData[]
@@ -249,13 +265,16 @@ public class EdocCacheService {
         }
     }
 
-    private void fillOutgoing(EdocCachedDocumentEntity e, OutgoingDocumentData d) {
+    private void fillOutgoing(EdocCachedDocumentEntity e,
+                              OutgoingDocumentData d,
+                              List<PendingResponsibleParent> pendingResponsibleParents,
+                              List<PendingViseParent> pendingViseParents) {
         e.setHasDigitalSignature(d.isHasDigitalSignature());
         e.setHasDigitalStamp(d.isHasDigitalStamp());
 
         PreparationProcess pp = unwrap(d.getPreProcess());
         if (pp != null) {
-            e.setPreparationProcess(buildProcess(pp, true));
+            e.setPreparationProcess(buildProcess(pp, true, pendingResponsibleParents, pendingViseParents));
         }
 
         // Recipients: Contact[]
@@ -280,7 +299,10 @@ public class EdocCacheService {
         }
     }
 
-    private void fillOrder(EdocCachedDocumentEntity e, OrderDocumentData d) {
+    private void fillOrder(EdocCachedDocumentEntity e,
+                           OrderDocumentData d,
+                           List<PendingResponsibleParent> pendingResponsibleParents,
+                           List<PendingViseParent> pendingViseParents) {
         e.setDirection(d.getDirection() != null ? d.getDirection().value() : null);
         e.setHasDigitalSignature(d.isHasDigitalSignature());
         e.setHasDigitalStamp(d.isHasDigitalStamp());
@@ -288,7 +310,7 @@ public class EdocCacheService {
 
         PreparationProcess pp = unwrap(d.getPreProcess());
         if (pp != null) {
-            e.setPreparationProcess(buildProcess(pp, true));
+            e.setPreparationProcess(buildProcess(pp, true, pendingResponsibleParents, pendingViseParents));
         }
 
         // OuterRecipients: Contact[]
@@ -333,7 +355,10 @@ public class EdocCacheService {
     // Process building
     // ─────────────────────────────────────────────────────────────────────────
 
-    private EdocProcessEntity buildProcess(org.datacontract.schemas._2004._07.fas_docmanagement_integration.Process p, boolean isPreparation) {
+    private EdocProcessEntity buildProcess(org.datacontract.schemas._2004._07.fas_docmanagement_integration.Process p,
+                                           boolean isPreparation,
+                                           List<PendingResponsibleParent> pendingResponsibleParents,
+                                           List<PendingViseParent> pendingViseParents) {
         EdocProcessEntity pe = new EdocProcessEntity();
         TaskData task = unwrap(p.getTask());
         if (task != null) {
@@ -351,7 +376,7 @@ public class EdocCacheService {
         ArrayOfResponsibleData resArr = unwrap(p.getResponsibles());
         if (resArr != null && resArr.getResponsibleData() != null) {
             for (ResponsibleData rd : resArr.getResponsibleData()) {
-                buildResponsible(pe, rd, null); // null = top-level responsible
+                buildResponsible(pe, rd, null, pendingResponsibleParents);
             }
         }
 
@@ -374,7 +399,7 @@ public class EdocCacheService {
             ArrayOfViseData visesArr = unwrap(prep.getVises());
             if (visesArr != null && visesArr.getViseData() != null) {
                 for (ViseData vd : visesArr.getViseData()) {
-                    buildVise(pe, vd, null);
+                    buildVise(pe, vd, null, pendingViseParents);
                 }
             }
         }
@@ -388,10 +413,13 @@ public class EdocCacheService {
      * process_id FK is set for every row. The parent_id column stores the hierarchy.
      * Note: child entities are saved after their parents so that parentId can be resolved.
      */
-    private void buildResponsible(EdocProcessEntity pe, ResponsibleData rd, Long parentId) {
+    private void buildResponsible(EdocProcessEntity pe,
+                                  ResponsibleData rd,
+                                  EdocResponsibleEntity parent,
+                                  List<PendingResponsibleParent> pendingResponsibleParents) {
         EdocResponsibleEntity re = new EdocResponsibleEntity();
         re.setProcess(pe);
-        re.setParentId(parentId);
+        re.setParentId(parent != null ? parent.getId() : null);
         re.setStartDate(toOffset(rd.getStartDate()));
         re.setDeadline(toOffset(rd.getDeadline()));
         re.setTask(unwrapStr(rd.getTask()));
@@ -399,24 +427,25 @@ public class EdocCacheService {
         re.setStatusChangeDate(toOffset(rd.getStatusChangeDate()));
         re.setEmployee(buildEmployeeNullable(unwrap(rd.getEmployee())));
         pe.getResponsibles().add(re);
-        // Note: re.id is not yet assigned here (assigned by DB on flush).
-        // Child responsibles will be added to the process collection with a deferred parent reference.
-        // The full hierarchy is stored after the process is saved in a post-save step if needed.
-        // For now, children are stored flat with parentId resolved during cacheAndGetDetails.
+        if (parent != null) {
+            pendingResponsibleParents.add(new PendingResponsibleParent(re, parent));
+        }
 
         ArrayOfResponsibleData children = unwrap(rd.getChildResponsibles());
         if (children != null && children.getResponsibleData() != null) {
             for (ResponsibleData child : children.getResponsibleData()) {
-                // parentId will be set after save — use a deferred reference approach below
-                buildResponsible(pe, child, null); // parentId resolved post-save
+                buildResponsible(pe, child, re, pendingResponsibleParents);
             }
         }
     }
 
-    private void buildVise(EdocProcessEntity pe, ViseData vd, Long parentId) {
+    private void buildVise(EdocProcessEntity pe,
+                           ViseData vd,
+                           EdocViseEntity parent,
+                           List<PendingViseParent> pendingViseParents) {
         EdocViseEntity ve = new EdocViseEntity();
         ve.setProcess(pe);
-        ve.setParentId(parentId);
+        ve.setParentId(parent != null ? parent.getId() : null);
         ve.setAuthor(buildEmployeeNullable(unwrap(vd.getAuthor())));
         ve.setCreator(buildEmployeeNullable(unwrap(vd.getCreator())));
         ve.setDeadline(toOffset(vd.getDeadline()));
@@ -424,12 +453,42 @@ public class EdocCacheService {
         ve.setStatus(vd.getStatus() != null ? vd.getStatus().value() : null);
         ve.setStatusChangeDate(toOffset(vd.getStatusChangeDate()));
         pe.getVises().add(ve);
+        if (parent != null) {
+            pendingViseParents.add(new PendingViseParent(ve, parent));
+        }
 
         ArrayOfViseData children = unwrap(vd.getChildVises());
         if (children != null && children.getViseData() != null) {
             for (ViseData child : children.getViseData()) {
-                buildVise(pe, child, null); // parentId resolved post-save
+                buildVise(pe, child, ve, pendingViseParents);
             }
+        }
+    }
+
+    private void resolveDeferredHierarchyLinks(List<PendingResponsibleParent> pendingResponsibleParents,
+                                               List<PendingViseParent> pendingViseParents) {
+        boolean changed = false;
+
+        for (PendingResponsibleParent pending : pendingResponsibleParents) {
+            EdocResponsibleEntity child = pending.child();
+            EdocResponsibleEntity parent = pending.parent();
+            if (child != null && parent != null && child.getParentId() == null && parent.getId() != null) {
+                child.setParentId(parent.getId());
+                changed = true;
+            }
+        }
+
+        for (PendingViseParent pending : pendingViseParents) {
+            EdocViseEntity child = pending.child();
+            EdocViseEntity parent = pending.parent();
+            if (child != null && parent != null && child.getParentId() == null && parent.getId() != null) {
+                child.setParentId(parent.getId());
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            entityManager.flush();
         }
     }
 
@@ -464,23 +523,32 @@ public class EdocCacheService {
 
     private EdocContactEntity saveOrUpdateContact(Contact c) {
         UUID id = extractId(c.getID());
-        return contactRepo.findById(id).orElseGet(() -> {
-            EdocContactEntity ce = new EdocContactEntity();
-            ce.setId(id);
-            ce.setContactType(c.getContactType() != null ? c.getContactType().value() : "Unknown");
-            if (c instanceof PhysicalPerson pp) {
-                ce.setFirstName(unwrapStr(pp.getFirstName()));
-                ce.setLastName(unwrapStr(pp.getLastName()));
-                ce.setPersonalNumber(unwrapStr(pp.getPersonalNumber()));
-            } else if (c instanceof Organization org) {
-                ce.setIdentificationNumber(unwrapStr(org.getIdentificationNumber()));
-                ce.setJuridicalForm(unwrapStr(org.getJuridicalForm()));
-                ce.setName(unwrapStr(org.getName()));
-            } else if (c instanceof StateStructure ss) {
-                ce.setName(unwrapStr(ss.getName()));
-            }
-            return contactRepo.save(ce);
+        EdocContactEntity ce = contactRepo.findById(id).orElseGet(() -> {
+            EdocContactEntity created = new EdocContactEntity();
+            created.setId(id);
+            return created;
         });
+
+        ce.setContactType(c.getContactType() != null ? c.getContactType().value() : "Unknown");
+        ce.setFirstName(null);
+        ce.setLastName(null);
+        ce.setPersonalNumber(null);
+        ce.setIdentificationNumber(null);
+        ce.setJuridicalForm(null);
+        ce.setName(null);
+
+        if (c instanceof PhysicalPerson pp) {
+            ce.setFirstName(unwrapStr(pp.getFirstName()));
+            ce.setLastName(unwrapStr(pp.getLastName()));
+            ce.setPersonalNumber(unwrapStr(pp.getPersonalNumber()));
+        } else if (c instanceof Organization org) {
+            ce.setIdentificationNumber(unwrapStr(org.getIdentificationNumber()));
+            ce.setJuridicalForm(unwrapStr(org.getJuridicalForm()));
+            ce.setName(unwrapStr(org.getName()));
+        } else if (c instanceof StateStructure ss) {
+            ce.setName(unwrapStr(ss.getName()));
+        }
+        return contactRepo.save(ce);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -550,6 +618,7 @@ public class EdocCacheService {
         dto.setOuterRecipients(orderOuter.isEmpty() ? null : orderOuter);
 
         dto.setAddressees(empDtoList(e, "INCOMING_ADDRESSEE"));
+        dto.setResponsibles(resolveResultProcessResponsibles(e));
         dto.setEmployeeSenders(empDtoList(e, "INTERNAL_SENDER"));
         dto.setEmployeeRecipients(empDtoList(e, "INTERNAL_RECIPIENT"));
         dto.setSignatories(empDtoList(e, "OUTGOING_SIGNATORY"));
@@ -578,6 +647,34 @@ public class EdocCacheService {
                 .map(el -> toEmployeeDto(el.getEmployee()))
                 .collect(Collectors.toList());
         return result.isEmpty() ? null : result;
+    }
+
+    private List<EdocEmployeeDto> resolveResultProcessResponsibles(EdocCachedDocumentEntity e) {
+        if (e.getResultProcess() == null || e.getResultProcess().getResponsibles() == null) {
+            return null;
+        }
+
+        LinkedHashMap<String, EdocEmployeeDto> unique = new LinkedHashMap<>();
+        for (EdocResponsibleEntity responsible : e.getResultProcess().getResponsibles()) {
+            if (responsible == null || responsible.getEmployee() == null) continue;
+            EdocEmployeeDto dto = toEmployeeDto(responsible.getEmployee());
+            String key = String.join("|",
+                    normalizePart(dto.getFirstName()),
+                    normalizePart(dto.getLastName()),
+                    normalizePart(dto.getPosition()),
+                    normalizePart(dto.getOrganizationStructure())
+            );
+            unique.putIfAbsent(key, dto);
+        }
+
+        if (unique.isEmpty()) {
+            return null;
+        }
+        return new ArrayList<>(unique.values());
+    }
+
+    private String normalizePart(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     private EdocContactDto toContactDto(EdocContactEntity c) {

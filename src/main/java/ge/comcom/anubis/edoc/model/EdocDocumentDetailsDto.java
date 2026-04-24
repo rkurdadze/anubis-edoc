@@ -33,6 +33,7 @@ public class EdocDocumentDetailsDto {
     private OffsetDateTime originalDate;
     private List<EdocContactDto> senders;           // Contact[]
     private List<EdocEmployeeDto> addressees;        // EmployeeData[]
+    private List<EdocEmployeeDto> responsibles;      // ResultProcess.Responsibles (flattened)
     private List<EdocReceiveWayDto> receiveWays;
 
     // InternalDocumentData

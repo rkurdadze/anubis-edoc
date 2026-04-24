@@ -18,9 +18,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -103,8 +105,26 @@ public class EdocDocumentsController {
         String filename = documentService.getFileName(id, fileId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", filename);
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, buildAttachmentDisposition(filename));
         return ResponseEntity.ok().headers(headers).body(content);
+    }
+
+    private String buildAttachmentDisposition(String filename) {
+        String safeName = (filename == null || filename.isBlank()) ? "file" : filename;
+        String asciiFallback = toAsciiFilename(safeName);
+        String encodedUtf8 = UriUtils.encode(safeName, StandardCharsets.UTF_8)
+                .replace("+", "%20");
+        return "attachment; filename=\"" + asciiFallback + "\"; filename*=UTF-8''" + encodedUtf8;
+    }
+
+    private String toAsciiFilename(String filename) {
+        String ascii = filename.replaceAll("[^\\x20-\\x7E]", "_")
+                .replace("\"", "")
+                .replace("\\\\", "_");
+        if (ascii.isBlank()) {
+            return "file";
+        }
+        return ascii;
     }
 
     @PostMapping("/{id}/exported")
