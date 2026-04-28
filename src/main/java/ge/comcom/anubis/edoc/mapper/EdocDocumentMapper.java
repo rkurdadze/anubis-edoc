@@ -60,6 +60,7 @@ public interface EdocDocumentMapper {
     @Mapping(target = "originalDate", ignore = true)
     @Mapping(target = "senders", ignore = true)
     @Mapping(target = "addressees", ignore = true)
+    @Mapping(target = "responsibles", ignore = true)
     @Mapping(target = "receiveWays", ignore = true)
     @Mapping(target = "employeeSenders", ignore = true)
     @Mapping(target = "employeeRecipients", ignore = true)
@@ -67,11 +68,13 @@ public interface EdocDocumentMapper {
     @Mapping(target = "hasDigitalStamp", ignore = true)
     @Mapping(target = "recipients", ignore = true)
     @Mapping(target = "signatories", ignore = true)
+    @Mapping(target = "signatures", ignore = true)
     @Mapping(target = "direction", ignore = true)
     @Mapping(target = "orderType", ignore = true)
     @Mapping(target = "outerRecipients", ignore = true)
     @Mapping(target = "innerRecipients", ignore = true)
     @Mapping(target = "relatedEmployees", ignore = true)
+    @Mapping(target = "vises", ignore = true)
     EdocDocumentDetailsDto toDetails(DocumentData data);
 
     default List<EdocDocumentFileDto> mapFiles(JAXBElement<ArrayOfDocumentFile> filesElement) {

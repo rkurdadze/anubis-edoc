@@ -20,6 +20,7 @@ public class EdocDocumentDetailsDto {
     private String comments;
     private String chancellary;
     private String purpose;
+    private String task;
     private List<EdocDocumentFileDto> files;
     private List<EdocRelatedDocumentDto> relatedDocuments;
 
@@ -47,6 +48,7 @@ public class EdocDocumentDetailsDto {
     // OutgoingDocumentData
     private List<EdocContactDto> recipients;         // Contact[]
     private List<EdocEmployeeDto> signatories;       // EmployeeData[]
+    private List<EdocSignatureDto> signatures;       // PreparationProcess.Signatures
 
     // OrderDocumentData
     private String direction;
@@ -54,4 +56,5 @@ public class EdocDocumentDetailsDto {
     private List<EdocContactDto> outerRecipients;    // Contact[]
     private List<EdocEmployeeDto> innerRecipients;   // EmployeeData[]
     private List<EdocEmployeeDto> relatedEmployees;  // EmployeeData[]
+    private List<EdocViseDto> vises;                 // PreparationProcess.Vises
 }

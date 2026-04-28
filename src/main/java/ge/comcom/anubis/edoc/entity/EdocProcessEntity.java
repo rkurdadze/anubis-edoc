@@ -38,12 +38,15 @@ public class EdocProcessEntity {
     private EdocEmployeeEntity taskInitiatedBy;
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<EdocResponsibleEntity> responsibles = new ArrayList<>();
 
     // PreparationProcess only
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<EdocSignatureEntity> signatures = new ArrayList<>();
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<EdocViseEntity> vises = new ArrayList<>();
 }

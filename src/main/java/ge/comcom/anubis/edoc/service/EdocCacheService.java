@@ -4,6 +4,7 @@ import ge.comcom.anubis.edoc.entity.*;
 import ge.comcom.anubis.edoc.model.*;
 import ge.comcom.anubis.edoc.repository.EdocCachedDocumentRepository;
 import ge.comcom.anubis.edoc.repository.EdocContactRepository;
+import ge.comcom.anubis.edoc.repository.EdocEmployeeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.xml.bind.JAXBElement;
@@ -25,6 +26,7 @@ public class EdocCacheService {
 
     private final EdocCachedDocumentRepository documentRepo;
     private final EdocContactRepository contactRepo;
+    private final EdocEmployeeRepository employeeRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -505,12 +507,26 @@ public class EdocCacheService {
     }
 
     private EdocEmployeeEntity buildEmployee(EmployeeData emp) {
+        if (emp == null) {
+            return null;
+        }
+
+        String firstName = normalizeNullable(unwrapStr(emp.getFirstName()));
+        String lastName = normalizeNullable(unwrapStr(emp.getLastName()));
+        String position = normalizeNullable(unwrapStr(emp.getPosition()));
+        String organizationStructure = normalizeNullable(unwrapStr(emp.getOrganizationStructure()));
+
+        Optional<EdocEmployeeEntity> existing = employeeRepo.findCanonical(firstName, lastName, position, organizationStructure);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
         EdocEmployeeEntity e = new EdocEmployeeEntity();
-        e.setFirstName(unwrapStr(emp.getFirstName()));
-        e.setLastName(unwrapStr(emp.getLastName()));
-        e.setPosition(unwrapStr(emp.getPosition()));
-        e.setOrganizationStructure(unwrapStr(emp.getOrganizationStructure()));
-        return e;
+        e.setFirstName(firstName);
+        e.setLastName(lastName);
+        e.setPosition(position);
+        e.setOrganizationStructure(organizationStructure);
+        return employeeRepo.save(e);
     }
 
     private EdocEmployeeEntity buildEmployeeNullable(EmployeeData emp) {
@@ -569,6 +585,7 @@ public class EdocCacheService {
         dto.setChancellary(e.getChancellary());
         dto.setComments(e.getComments());
         dto.setPurpose(e.getPurpose());
+        dto.setTask(resolveDocumentTask(e));
         dto.setFromCache(true);
         dto.setCachedAt(e.getCachedAt());
         dto.setFetchCount(e.getFetchCount());
@@ -617,21 +634,52 @@ public class EdocCacheService {
         dto.setRecipients(outRecipients.isEmpty() ? null : outRecipients);
         dto.setOuterRecipients(orderOuter.isEmpty() ? null : orderOuter);
 
-        dto.setAddressees(empDtoList(e, "INCOMING_ADDRESSEE"));
-        dto.setResponsibles(resolveResultProcessResponsibles(e));
+        dto.setAddressees(resolveDocumentAddressees(e));
+        dto.setResponsibles(resolveDocumentResponsibles(e));
         dto.setEmployeeSenders(empDtoList(e, "INTERNAL_SENDER"));
         dto.setEmployeeRecipients(empDtoList(e, "INTERNAL_RECIPIENT"));
-        dto.setSignatories(empDtoList(e, "OUTGOING_SIGNATORY"));
+        dto.setSignatories(resolveDocumentSignatories(e));
         dto.setInnerRecipients(empDtoList(e, "ORDER_INNER_RECIPIENT"));
         dto.setRelatedEmployees(empDtoList(e, "ORDER_RELATED_EMPLOYEE"));
-
-        // ORDER_SIGNATORY overrides signatories if present
-        List<EdocEmployeeDto> orderSignatories = empDtoList(e, "ORDER_SIGNATORY");
-        if (orderSignatories != null) {
-            dto.setSignatories(orderSignatories);
-        }
+        dto.setSignatures(signatureDtoList(e));
+        dto.setVises(viseDtoList(e));
 
         return dto;
+    }
+
+    private String resolveDocumentTask(EdocCachedDocumentEntity e) {
+        String task = normalizeNullable(e != null && e.getResultProcess() != null ? e.getResultProcess().getTaskText() : null);
+        if (task != null) {
+            return task;
+        }
+
+        task = normalizeNullable(e != null && e.getPreparationProcess() != null ? e.getPreparationProcess().getTaskText() : null);
+        if (task != null) {
+            return task;
+        }
+
+        task = firstResponsibleTask(e != null ? e.getResultProcess() : null);
+        if (task != null) {
+            return task;
+        }
+
+        return firstResponsibleTask(e != null ? e.getPreparationProcess() : null);
+    }
+
+    private String firstResponsibleTask(EdocProcessEntity process) {
+        if (process == null || process.getResponsibles() == null) {
+            return null;
+        }
+        for (EdocResponsibleEntity responsible : process.getResponsibles()) {
+            if (responsible == null) {
+                continue;
+            }
+            String task = normalizeNullable(responsible.getTask());
+            if (task != null) {
+                return task;
+            }
+        }
+        return null;
     }
 
     private List<EdocContactDto> contactsOfRole(EdocCachedDocumentEntity e, String role) {
@@ -649,14 +697,31 @@ public class EdocCacheService {
         return result.isEmpty() ? null : result;
     }
 
-    private List<EdocEmployeeDto> resolveResultProcessResponsibles(EdocCachedDocumentEntity e) {
-        if (e.getResultProcess() == null || e.getResultProcess().getResponsibles() == null) {
-            return null;
+    private List<EdocEmployeeDto> resolveDocumentAddressees(EdocCachedDocumentEntity e) {
+        List<EdocEmployeeDto> incoming = empDtoList(e, "INCOMING_ADDRESSEE");
+        if (incoming != null && !incoming.isEmpty()) {
+            return incoming;
         }
 
+        // For ORDER documents eDoc often doesn't provide explicit Addressees.
+        // Keep historical behavior used by existing objects:
+        // top-level ResultProcess.Responsibles only.
+        if (e != null && "Order".equalsIgnoreCase(e.getDocumentType())) {
+            List<EdocEmployeeDto> topLevelResult = resolveOrderTopLevelResultAddressees(e);
+            if (topLevelResult != null && !topLevelResult.isEmpty()) return topLevelResult;
+        }
+        return null;
+    }
+
+    private List<EdocEmployeeDto> resolveOrderTopLevelResultAddressees(EdocCachedDocumentEntity e) {
+        if (e == null || e.getResultProcess() == null || e.getResultProcess().getResponsibles() == null) {
+            return null;
+        }
         LinkedHashMap<String, EdocEmployeeDto> unique = new LinkedHashMap<>();
         for (EdocResponsibleEntity responsible : e.getResultProcess().getResponsibles()) {
-            if (responsible == null || responsible.getEmployee() == null) continue;
+            if (responsible == null || responsible.getEmployee() == null) {
+                continue;
+            }
             EdocEmployeeDto dto = toEmployeeDto(responsible.getEmployee());
             String key = String.join("|",
                     normalizePart(dto.getFirstName()),
@@ -666,15 +731,109 @@ public class EdocCacheService {
             );
             unique.putIfAbsent(key, dto);
         }
+        return unique.isEmpty() ? null : new ArrayList<>(unique.values());
+    }
 
+    private List<EdocEmployeeDto> resolveDocumentSignatories(EdocCachedDocumentEntity e) {
+        LinkedHashMap<String, EdocEmployeeDto> unique = new LinkedHashMap<>();
+
+        if (e != null && "Order".equalsIgnoreCase(e.getDocumentType())
+                && e.getPreparationProcess() != null
+                && e.getPreparationProcess().getSignatures() != null) {
+            for (EdocSignatureEntity signature : e.getPreparationProcess().getSignatures()) {
+                if (signature == null || signature.getSignatory() == null) {
+                    continue;
+                }
+                EdocEmployeeDto dto = toEmployeeDto(signature.getSignatory());
+                String key = String.join("|",
+                        normalizePart(dto.getFirstName()),
+                        normalizePart(dto.getLastName()),
+                        normalizePart(dto.getPosition()),
+                        normalizePart(dto.getOrganizationStructure())
+                );
+                unique.putIfAbsent(key, dto);
+            }
+            if (!unique.isEmpty()) {
+                return new ArrayList<>(unique.values());
+            }
+        }
+
+        List<EdocEmployeeDto> orderSignatories = empDtoList(e, "ORDER_SIGNATORY");
+        if (orderSignatories != null && !orderSignatories.isEmpty()) {
+            return orderSignatories;
+        }
+        return empDtoList(e, "OUTGOING_SIGNATORY");
+    }
+
+    private List<EdocSignatureDto> signatureDtoList(EdocCachedDocumentEntity e) {
+        if (e.getPreparationProcess() == null || e.getPreparationProcess().getSignatures() == null) {
+            return null;
+        }
+        List<EdocSignatureDto> signatures = e.getPreparationProcess().getSignatures().stream()
+                .map(this::toSignatureDto)
+                .toList();
+        return signatures.isEmpty() ? null : signatures;
+    }
+
+    private List<EdocViseDto> viseDtoList(EdocCachedDocumentEntity e) {
+        if (e.getPreparationProcess() == null || e.getPreparationProcess().getVises() == null) {
+            return null;
+        }
+        List<EdocViseDto> vises = e.getPreparationProcess().getVises().stream()
+                .sorted(Comparator.comparing(EdocViseEntity::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(this::toViseDto)
+                .toList();
+        return vises.isEmpty() ? null : vises;
+    }
+
+    private List<EdocEmployeeDto> resolveDocumentResponsibles(EdocCachedDocumentEntity e) {
+        LinkedHashMap<String, EdocEmployeeDto> unique = new LinkedHashMap<>();
+        if (e != null && "Order".equalsIgnoreCase(e.getDocumentType())) {
+            collectResponsiblesFromProcess(e.getPreparationProcess(), unique);
+            if (unique.isEmpty()) {
+                collectResponsiblesFromProcess(e.getResultProcess(), unique);
+            }
+        } else {
+            collectResponsiblesFromProcess(e != null ? e.getResultProcess() : null, unique);
+            if (unique.isEmpty()) {
+                collectResponsiblesFromProcess(e != null ? e.getPreparationProcess() : null, unique);
+            }
+        }
         if (unique.isEmpty()) {
             return null;
         }
         return new ArrayList<>(unique.values());
     }
 
+    private void collectResponsiblesFromProcess(EdocProcessEntity process, LinkedHashMap<String, EdocEmployeeDto> unique) {
+        if (process == null || process.getResponsibles() == null) {
+            return;
+        }
+        for (EdocResponsibleEntity responsible : process.getResponsibles()) {
+            if (responsible == null || responsible.getEmployee() == null) {
+                continue;
+            }
+            EdocEmployeeDto dto = toEmployeeDto(responsible.getEmployee());
+            String key = String.join("|",
+                    normalizePart(dto.getFirstName()),
+                    normalizePart(dto.getLastName()),
+                    normalizePart(dto.getPosition()),
+                    normalizePart(dto.getOrganizationStructure())
+            );
+            unique.putIfAbsent(key, dto);
+        }
+    }
+
     private String normalizePart(String value) {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private EdocContactDto toContactDto(EdocContactEntity c) {
@@ -697,6 +856,33 @@ public class EdocCacheService {
         dto.setPosition(e.getPosition());
         dto.setOrganizationStructure(e.getOrganizationStructure());
         return dto;
+    }
+
+    private EdocSignatureDto toSignatureDto(EdocSignatureEntity signature) {
+        EdocSignatureDto dto = new EdocSignatureDto();
+        dto.setCreator(toEmployeeDtoNullable(signature.getCreator()));
+        dto.setSignatory(toEmployeeDtoNullable(signature.getSignatory()));
+        dto.setDeadline(signature.getDeadline());
+        dto.setEntryDate(signature.getEntryDate());
+        dto.setStatus(signature.getStatus());
+        dto.setStatusChangeDate(signature.getStatusChangeDate());
+        return dto;
+    }
+
+    private EdocViseDto toViseDto(EdocViseEntity vise) {
+        EdocViseDto dto = new EdocViseDto();
+        dto.setParentId(vise.getParentId());
+        dto.setAuthor(toEmployeeDtoNullable(vise.getAuthor()));
+        dto.setCreator(toEmployeeDtoNullable(vise.getCreator()));
+        dto.setDeadline(vise.getDeadline());
+        dto.setEntryDate(vise.getEntryDate());
+        dto.setStatus(vise.getStatus());
+        dto.setStatusChangeDate(vise.getStatusChangeDate());
+        return dto;
+    }
+
+    private EdocEmployeeDto toEmployeeDtoNullable(EdocEmployeeEntity employee) {
+        return employee != null ? toEmployeeDto(employee) : null;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
