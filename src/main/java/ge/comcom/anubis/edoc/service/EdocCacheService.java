@@ -636,6 +636,7 @@ public class EdocCacheService {
 
         dto.setAddressees(resolveDocumentAddressees(e));
         dto.setResponsibles(resolveDocumentResponsibles(e));
+        dto.setTaskInitiatedBy(resolveTaskInitiatedBy(e));
         dto.setEmployeeSenders(empDtoList(e, "INTERNAL_SENDER"));
         dto.setEmployeeRecipients(empDtoList(e, "INTERNAL_RECIPIENT"));
         dto.setSignatories(resolveDocumentSignatories(e));
@@ -682,6 +683,16 @@ public class EdocCacheService {
         return null;
     }
 
+    private EdocEmployeeDto resolveTaskInitiatedBy(EdocCachedDocumentEntity e) {
+        if (e != null && e.getResultProcess() != null && e.getResultProcess().getTaskInitiatedBy() != null) {
+            return toEmployeeDto(e.getResultProcess().getTaskInitiatedBy());
+        }
+        if (e != null && e.getPreparationProcess() != null && e.getPreparationProcess().getTaskInitiatedBy() != null) {
+            return toEmployeeDto(e.getPreparationProcess().getTaskInitiatedBy());
+        }
+        return null;
+    }
+
     private List<EdocContactDto> contactsOfRole(EdocCachedDocumentEntity e, String role) {
         return e.getContacts().stream()
                 .filter(c -> role.equals(c.getRole()))
@@ -698,6 +709,14 @@ public class EdocCacheService {
     }
 
     private List<EdocEmployeeDto> resolveDocumentAddressees(EdocCachedDocumentEntity e) {
+        // Internal documents: addressees must come from internal recipients.
+        if (e != null && "Internal".equalsIgnoreCase(e.getDocumentType())) {
+            List<EdocEmployeeDto> internalRecipients = empDtoList(e, "INTERNAL_RECIPIENT");
+            if (internalRecipients != null && !internalRecipients.isEmpty()) {
+                return internalRecipients;
+            }
+        }
+
         List<EdocEmployeeDto> incoming = empDtoList(e, "INCOMING_ADDRESSEE");
         if (incoming != null && !incoming.isEmpty()) {
             return incoming;
@@ -737,7 +756,9 @@ public class EdocCacheService {
     private List<EdocEmployeeDto> resolveDocumentSignatories(EdocCachedDocumentEntity e) {
         LinkedHashMap<String, EdocEmployeeDto> unique = new LinkedHashMap<>();
 
-        if (e != null && "Order".equalsIgnoreCase(e.getDocumentType())
+        // Use PreparationProcess.Signatures for all document types when present.
+        // For Internal documents this is often the only reliable source of signatories.
+        if (e != null
                 && e.getPreparationProcess() != null
                 && e.getPreparationProcess().getSignatures() != null) {
             for (EdocSignatureEntity signature : e.getPreparationProcess().getSignatures()) {
