@@ -1,6 +1,7 @@
 package ge.comcom.anubis.edoc.controller;
 
 import ge.comcom.anubis.edoc.model.EdocCacheStatusDto;
+import ge.comcom.anubis.edoc.model.EdocDataSource;
 import ge.comcom.anubis.edoc.model.EdocDocumentDetailsDto;
 import ge.comcom.anubis.edoc.model.EdocDocumentSummaryDto;
 import ge.comcom.anubis.edoc.service.EdocDocumentService;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -53,11 +55,27 @@ public class EdocDocumentsController {
             @Parameter(description = "Дата по", example = "2025-12-31")
             @RequestParam(name = "to", defaultValue = "2025-12-31")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @Parameter(description = "Источник данных: local (только кэш) или remote")
+            @RequestParam(name = "source", defaultValue = "remote") EdocDataSource source,
             @Parameter(description = "Тип связанного контакта")
             @RequestParam(name = "contactType", required = false) ContactTypes contactType,
             @Parameter(description = "ID связанного контакта (GUID)")
-            @RequestParam(name = "contactId", required = false) UUID contactId) {
-        return documentService.getDocuments(type, from, to, contactType, contactId);
+            @RequestParam(name = "contactId", required = false) String contactId) {
+        if (source == EdocDataSource.local) {
+            return documentService.getDocumentsFromCache(type, from, to, contactType, contactId);
+        }
+        ContactTypes normalizedContactType = contactType;
+        UUID parsedContactId = null;
+        if (contactType != null && contactId != null && !contactId.isBlank()) {
+            try {
+                parsedContactId = UUID.fromString(contactId.trim());
+            } catch (IllegalArgumentException ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "contactId must be UUID for remote source");
+            }
+        } else {
+            normalizedContactType = null;
+        }
+        return documentService.getDocumentsRemote(type, from, to, normalizedContactType, parsedContactId);
     }
 
     @GetMapping("/{id}")

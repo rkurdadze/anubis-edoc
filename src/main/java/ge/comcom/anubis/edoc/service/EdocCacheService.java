@@ -14,6 +14,7 @@ import org.datacontract.schemas._2004._07.fas_docmanagement_integration.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -46,6 +47,22 @@ public class EdocCacheService {
         return documentRepo.findById(id).map(this::toDetailsDto);
     }
 
+    @Transactional(readOnly = true)
+    public List<EdocDocumentSummaryDto> findCachedSummaries(String documentType,
+                                                            LocalDate from,
+                                                            LocalDate to,
+                                                            ContactTypes contactType,
+                                                            String contactId) {
+        OffsetDateTime fromTs = from.atStartOfDay().atOffset(OffsetDateTime.now().getOffset());
+        OffsetDateTime toTs = to.plusDays(1).atStartOfDay().atOffset(OffsetDateTime.now().getOffset()).minusNanos(1);
+
+        return documentRepo.findByDocumentTypeAndRegistrationDateBetween(documentType, fromTs, toTs).stream()
+                .filter(doc -> matchesContactFilter(doc, contactType, contactId))
+                .map(this::toSummaryDto)
+                .sorted(Comparator.comparing(EdocDocumentSummaryDto::getRegistrationDate, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList();
+    }
+
     /**
      * Returns the cache status for a document (may or may not be cached).
      */
@@ -65,6 +82,48 @@ public class EdocCacheService {
         } else {
             dto.setCached(false);
         }
+        return dto;
+    }
+
+    private boolean matchesContactFilter(EdocCachedDocumentEntity doc, ContactTypes contactType, String contactId) {
+        if (contactType == null || contactId == null || contactId.isBlank()) {
+            return true;
+        }
+        if (doc.getContacts() == null || doc.getContacts().isEmpty()) {
+            return false;
+        }
+        String normalizedId = contactId.trim();
+        String expectedType = contactType.value();
+        return doc.getContacts().stream()
+                .map(EdocDocumentContactEntity::getContact)
+                .filter(Objects::nonNull)
+                .anyMatch(contact -> {
+                    if (!expectedType.equalsIgnoreCase(contact.getContactType())) {
+                        return false;
+                    }
+                    if ("PhysicalPerson".equalsIgnoreCase(expectedType)) {
+                        return normalizedId.equals(contact.getPersonalNumber());
+                    }
+                    if ("Organization".equalsIgnoreCase(expectedType)) {
+                        return normalizedId.equals(contact.getIdentificationNumber());
+                    }
+                    if ("StateStructure".equalsIgnoreCase(expectedType)) {
+                        return normalizedId.equals(contact.getName());
+                    }
+                    return false;
+                });
+    }
+
+    private EdocDocumentSummaryDto toSummaryDto(EdocCachedDocumentEntity entity) {
+        EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
+        dto.setId(entity.getId());
+        dto.setNumber(entity.getNumber());
+        dto.setCategory(entity.getCategory());
+        dto.setDocumentType(entity.getDocumentType());
+        dto.setDocumentStatus(entity.getDocumentStatus());
+        dto.setExportStatus(entity.getExportStatus());
+        dto.setRegistrationDate(entity.getRegistrationDate());
+        dto.setDeadline(entity.getDeadline());
         return dto;
     }
 

@@ -16,6 +16,7 @@ import org.datacontract.schemas._2004._07.fas_docmanagement_integration.ContactT
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentData;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.DocumentTypes;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -42,8 +43,8 @@ public class EdocDocumentService {
     /**
      * Returns document list from eDocument (always calls remote — no counter increment).
      */
-    public List<EdocDocumentSummaryDto> getDocuments(DocumentTypes type, LocalDate from, LocalDate to,
-                                                     ContactTypes contactType, UUID contactId) {
+    public List<EdocDocumentSummaryDto> getDocumentsRemote(DocumentTypes type, LocalDate from, LocalDate to,
+                                                           ContactTypes contactType, UUID contactId) {
         ContactTypes normalizedContactType = (contactType != null && contactId != null) ? contactType : null;
         UUID normalizedContactId = (contactType != null && contactId != null) ? contactId : null;
 
@@ -56,6 +57,14 @@ public class EdocDocumentService {
                 documentMapper.toSummaryList(client.getDocuments(sid, type, period, contact)));
         log.debug("Получено {} документов", result.size());
         return result;
+    }
+
+    public List<EdocDocumentSummaryDto> getDocumentsFromCache(DocumentTypes type, LocalDate from, LocalDate to,
+                                                              ContactTypes contactType, String contactId) {
+        validateParameters(type, from, to, null, null);
+        String normalizedContactId = StringUtils.hasText(contactId) ? contactId.trim() : null;
+        ContactTypes normalizedContactType = (contactType != null && normalizedContactId != null) ? contactType : null;
+        return cacheService.findCachedSummaries(type.value(), from, to, normalizedContactType, normalizedContactId);
     }
 
     /**

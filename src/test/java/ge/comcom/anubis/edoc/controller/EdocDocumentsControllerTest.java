@@ -1,6 +1,7 @@
 package ge.comcom.anubis.edoc.controller;
 
 import ge.comcom.anubis.edoc.model.EdocDocumentDetailsDto;
+import ge.comcom.anubis.edoc.model.EdocDataSource;
 import ge.comcom.anubis.edoc.model.EdocDocumentSummaryDto;
 import ge.comcom.anubis.edoc.service.EdocDocumentService;
 import org.datacontract.schemas._2004._07.fas_docmanagement_integration.ContactTypes;
@@ -36,13 +37,14 @@ class EdocDocumentsControllerTest {
     void returnsDocuments() throws Exception {
         EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
         dto.setNumber("DOC-1");
-        Mockito.when(service.getDocuments(any(DocumentTypes.class), any(), any(), any(ContactTypes.class), any()))
+        Mockito.when(service.getDocumentsRemote(any(DocumentTypes.class), any(), any(), any(ContactTypes.class), any()))
                 .thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/edoc/documents")
                         .param("type", DocumentTypes.INCOMING.value())
                         .param("from", LocalDate.of(2023, 1, 1).toString())
                         .param("to", LocalDate.of(2023, 12, 31).toString())
+                        .param("source", EdocDataSource.remote.name())
                         .param("contactType", ContactTypes.ORGANIZATION.value())
                         .param("contactId", UUID.randomUUID().toString()))
                 .andExpect(status().isOk())
@@ -53,12 +55,13 @@ class EdocDocumentsControllerTest {
     void returnsDocumentsWithoutContact() throws Exception {
         EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
         dto.setNumber("DOC-3");
-        Mockito.when(service.getDocuments(any(DocumentTypes.class), any(), any(), isNull(), isNull()))
+        Mockito.when(service.getDocumentsRemote(any(DocumentTypes.class), any(), any(), isNull(), isNull()))
                 .thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/edoc/documents")
                         .param("type", DocumentTypes.INTERNAL.value())
                         .param("from", LocalDate.of(2023, 1, 1).toString())
+                        .param("source", EdocDataSource.remote.name())
                         .param("to", LocalDate.of(2023, 2, 1).toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].number").value("DOC-3"));
@@ -68,16 +71,35 @@ class EdocDocumentsControllerTest {
     void ignoresContactTypeWithoutId() throws Exception {
         EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
         dto.setNumber("DOC-4");
-        Mockito.when(service.getDocuments(any(DocumentTypes.class), any(), any(), any(ContactTypes.class), isNull()))
+        Mockito.when(service.getDocumentsRemote(any(DocumentTypes.class), any(), any(), isNull(), isNull()))
                 .thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/edoc/documents")
                         .param("type", DocumentTypes.ORDER.value())
                         .param("from", LocalDate.of(2024, 1, 1).toString())
                         .param("to", LocalDate.of(2024, 3, 1).toString())
+                        .param("source", EdocDataSource.remote.name())
                         .param("contactType", ContactTypes.ORGANIZATION.value()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].number").value("DOC-4"));
+    }
+
+    @Test
+    void returnsCachedDocumentsForLocalSource() throws Exception {
+        EdocDocumentSummaryDto dto = new EdocDocumentSummaryDto();
+        dto.setNumber("CACHED-1");
+        Mockito.when(service.getDocumentsFromCache(any(DocumentTypes.class), any(), any(), any(ContactTypes.class), any()))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/edoc/documents")
+                        .param("type", DocumentTypes.INCOMING.value())
+                        .param("from", LocalDate.of(2023, 1, 1).toString())
+                        .param("to", LocalDate.of(2023, 12, 31).toString())
+                        .param("source", EdocDataSource.local.name())
+                        .param("contactType", ContactTypes.ORGANIZATION.value())
+                        .param("contactId", "123456789"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].number").value("CACHED-1"));
     }
 
     @Test
