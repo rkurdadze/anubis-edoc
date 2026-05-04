@@ -103,6 +103,7 @@ public class EdocDocumentService {
         try {
             EdocDocumentDetailsDto dto = cacheService.cacheAndGetDetails(data);
             log.info("Документ {} (статус: {}) сохранён в кэш", id, status);
+            markDocumentExportedRemotely(id);
             return dto;
         } catch (Exception cacheEx) {
             log.error("Не удалось сохранить документ {} в кэш (статус: {}): {}", id, status, cacheEx.getMessage(), cacheEx);
@@ -112,11 +113,29 @@ public class EdocDocumentService {
     }
 
     /**
-     * Marks the document as exported in the local cache only.
-     * Does NOT call the remote eDocument service.
+     * Confirms export on remote eDocument service and syncs local cache to Exported.
      */
     public void markExported(UUID id) {
-        cacheService.markExported(id);
+        markDocumentExportedRemotely(id);
+    }
+
+    /**
+     * Confirms successful export/import on remote eDocument service.
+     * Called only after the document is fully written into local cache.
+     * Local ExportStatus is also synced to "Exported" when remote call succeeds.
+     */
+    private void markDocumentExportedRemotely(UUID id) {
+        try {
+            sessionService.withSession(sid -> {
+                client.setDocumentExported(sid, id.toString());
+                return null;
+            });
+            cacheService.markExported(id);
+            log.info("Документ {} помечен как Exported на удалённом eDocument и в локальном кэше", id);
+        } catch (Exception ex) {
+            // Do not break fetch flow: local cache is already complete.
+            log.warn("Не удалось пометить документ {} как Exported на удалённом eDocument: {}", id, ex.getMessage());
+        }
     }
 
     public byte[] getFileContent(UUID docId, Long fileId) {
